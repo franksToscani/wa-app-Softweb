@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('product_translations', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('sku')->nullable()->unique('sku_unique');
+            $table->string('sku')->nullable()->unique();
             $table->timestamp('create_at')->nullable();
             $table->timestamp('updated_at')->nullable();
             $table->unsignedBigInteger('languages_codes_id')->index('fk_product_translations_id1_idx');
             $table->unsignedBigInteger('products_id')->index('fk_product_translations_id2_idx');
 
-            $table->primary(['id', 'languages_codes_id', 'products_id']);
+            // Use single primary key 'id' for SQLite compatibility.
+            // $table->primary(['id', 'languages_codes_id', 'products_id']);
         });
     }
 

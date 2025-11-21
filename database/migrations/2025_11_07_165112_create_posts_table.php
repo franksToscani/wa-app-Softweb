@@ -30,7 +30,10 @@ return new class extends Migration
             $table->unsignedBigInteger('categories_id')->index('fk_posts_id3_idx');
             $table->unsignedBigInteger('parent_id')->nullable()->index('fk_posts_parent_idx');
 
-            $table->primary(['id', 'posts_types_id', 'users_id', 'posts_status_id', 'media_id', 'categories_id']);
+            // Use single primary key 'id' for SQLite compatibility. Composite
+            // primary keys with autoincrement columns aren't portable to SQLite
+            // and cause test migrations to fail.
+            // $table->primary(['id', 'posts_types_id', 'users_id', 'posts_status_id', 'media_id', 'categories_id']);
         });
     }
 

@@ -18,7 +18,8 @@ return new class extends Migration
             $table->timestamp('created_at')->nullable();
             $table->softDeletes();
 
-            $table->primary(['id', 'products_id', 'product_attributes_id']);
+            // Use single primary key 'id' for SQLite compatibility.
+            // $table->primary(['id', 'products_id', 'product_attributes_id']);
         });
     }
 

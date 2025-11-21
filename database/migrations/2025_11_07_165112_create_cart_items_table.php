@@ -20,7 +20,10 @@ return new class extends Migration
             $table->decimal('subtotal', 10, 0)->nullable();
             $table->timestamps();
 
-            $table->primary(['id', 'carts_id', 'products_id']);
+            // Use a single primary key 'id'. Composite primary keys including an
+            // autoincrement column are not supported by SQLite and are unnecessary
+            // when using an explicit id column.
+            // $table->primary(['id', 'carts_id', 'products_id']);
         });
     }
 

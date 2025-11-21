@@ -22,7 +22,8 @@ return new class extends Migration
             $table->json('payload')->nullable();
             $table->timestamps();
 
-            $table->primary(['id', 'oders_id']);
+            // Use single primary key 'id' for SQLite compatibility.
+            // $table->primary(['id', 'oders_id']);
         });
     }
 

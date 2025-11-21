@@ -23,7 +23,8 @@ return new class extends Migration
             $table->unsignedBigInteger('category_types_id')->index('fk_categories_id1_idx');
             $table->unsignedBigInteger('parent_id')->nullable()->index('fk_categories_parent_idx');
 
-            $table->primary(['id', 'media_id', 'category_types_id']);
+            // Use single primary key 'id' for SQLite compatibility.
+            // $table->primary(['id', 'media_id', 'category_types_id']);
         });
     }
 

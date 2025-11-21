@@ -25,7 +25,8 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->primary(['id', 'users_id']);
+            // Use single primary key 'id' for SQLite compatibility.
+            // $table->primary(['id', 'users_id']);
         });
     }
 

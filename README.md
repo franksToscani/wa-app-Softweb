@@ -57,3 +57,46 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+## Note about tests and migrations (important)
+
+During local development we run the test-suite using SQLite in-memory to keep tests fast and isolated.
+
+To make the existing project migrations run reliably under SQLite (used by PHPUnit in `phpunit.xml`) a
+small set of compatibility adjustments were made to the migration files in this branch. These are **test-focused**
+changes that avoid SQLite-specific migration errors such as:
+
+- composite primary keys that include an autoincrement `id` column (SQLite can't create an AUTOINCREMENT column
+	as part of a composite primary key);
+- explicit, repeated index/unique names (SQLite treats index names globally in an in-memory DB and identically
+	named indexes across tables cause collisions).
+
+Why we did this
+- The changes keep tests green and fast (no external MySQL test DB required). They are minimal and scoped to
+	migration definitions only so tests can run in CI or locally using `php artisan test`.
+
+How this affects production
+- If your production schema requires the original MySQL-only constraints (composite PKs or specific index names),
+	you should either:
+	- create a dedicated MySQL test database and update `phpunit.xml` accordingly, or
+	- add separate migration(s) that apply production-only constraints at deploy time (or gated by an environment
+		check).
+
+Commands to run the test-suite locally
+```bash
+# ensure php-sqlite3 is installed (on Debian/Ubuntu):
+sudo apt-get update
+sudo apt-get install -y php-sqlite3
+
+# fix permissions if you get storage permission errors:
+sudo chown -R $(whoami):www-data storage bootstrap/cache
+sudo chmod -R ug+rwx storage bootstrap/cache
+
+# run tests (non-parallel):
+php artisan test --no-coverage
+```
+
+If you'd like, I can prepare a follow-up PR that keeps production-targeted migrations unchanged and adds a
+small `migrations/testing` step that runs only for SQLite test environments. For now this branch contains the
+compatibility edits so local tests pass quickly.

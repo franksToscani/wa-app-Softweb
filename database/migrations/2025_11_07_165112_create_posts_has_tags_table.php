@@ -18,7 +18,8 @@ return new class extends Migration
             $table->timestamp('create_at')->nullable();
             $table->timestamp('update_at')->nullable();
 
-            $table->primary(['id', 'posts_id', 'tags_id']);
+            // Use single primary key 'id' for SQLite compatibility.
+            // $table->primary(['id', 'posts_id', 'tags_id']);
         });
     }
 

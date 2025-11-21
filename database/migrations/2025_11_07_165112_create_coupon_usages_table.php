@@ -19,7 +19,9 @@ return new class extends Migration
             $table->unsignedBigInteger('oders_id')->index('fk_coupon_usages_id3_idx');
             $table->timestamp('use_at')->nullable();
 
-            $table->primary(['id', 'coupons_id', 'users_id', 'oders_id']);
+            // Use single primary key 'id' for compatibility with SQLite and to
+            // avoid composite primary keys that include an autoincrement column.
+            // $table->primary(['id', 'coupons_id', 'users_id', 'oders_id']);
         });
     }
 

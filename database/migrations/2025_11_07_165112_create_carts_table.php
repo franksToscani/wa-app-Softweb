@@ -18,7 +18,10 @@ return new class extends Migration
             $table->decimal('discount_total', 10, 0)->nullable();
             $table->timestamps();
 
-            $table->primary(['id', 'users_id']);
+            // Use single primary key 'id' for compatibility with SQLite. Composite
+            // primary keys that include an autoincrement column cause errors in
+            // SQLite during tests.
+            // $table->primary(['id', 'users_id']);
         });
     }
 

@@ -18,7 +18,8 @@ return new class extends Migration
             $table->timestamps();
             $table->unsignedBigInteger('posts_id')->index('fk_posts_metas_id1_idx');
 
-            $table->primary(['id', 'posts_id']);
+            // Use single primary key 'id' for SQLite compatibility.
+            // $table->primary(['id', 'posts_id']);
         });
     }
 

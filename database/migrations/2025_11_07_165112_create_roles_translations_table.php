@@ -21,9 +21,10 @@ return new class extends Migration
             $table->unsignedBigInteger('roles_id')->index('fk_roles_translations_id1_idx');
             $table->unsignedBigInteger('languages_codes_id')->index('fk_roles_translations_id2_idx');
 
-            $table->unique(['languages_codes_id'], 'languages_codes_id_unique');
-            $table->primary(['id', 'roles_id', 'languages_codes_id']);
-            $table->unique(['roles_id'], 'roles_id_unique');
+            $table->unique(['languages_codes_id']);
+            // Use single primary key 'id' for SQLite compatibility.
+            // $table->primary(['id', 'roles_id', 'languages_codes_id']);
+            $table->unique(['roles_id']);
         });
     }
 

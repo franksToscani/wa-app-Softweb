@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('product_variants', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('products_id')->index('fk_product_variants_id1_idx');
-            $table->string('sku')->nullable()->unique('sku_unique');
+            $table->string('sku')->nullable()->unique();
             $table->bigInteger('stock_quantity')->nullable()->default(0);
             $table->decimal('regular_price', 10)->nullable();
             $table->decimal('sale_price', 10)->nullable();
@@ -25,7 +25,8 @@ return new class extends Migration
             $table->timestamp('create_at')->nullable();
             $table->timestamp('updated_at')->nullable();
 
-            $table->primary(['id', 'products_id']);
+            // Use single primary key 'id' for SQLite compatibility.
+            // $table->primary(['id', 'products_id']);
         });
     }
 

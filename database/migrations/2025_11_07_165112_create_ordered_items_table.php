@@ -23,7 +23,8 @@ return new class extends Migration
             $table->decimal('total', 10, 0)->nullable();
             $table->timestamps();
 
-            $table->primary(['id', 'oders_id', 'products_id']);
+            // Use single primary key 'id' for SQLite compatibility.
+            // $table->primary(['id', 'oders_id', 'products_id']);
         });
     }
 

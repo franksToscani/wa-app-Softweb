@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('sku')->nullable()->unique('sku_unique');
+            $table->string('sku')->nullable()->unique();
             $table->unsignedBigInteger('posts_id')->index('fk_products_id1_idx');
             $table->unsignedBigInteger('medias_id')->index('fk_products_id2_idx');
             $table->unsignedBigInteger('posts_status_id')->index('fk_products_id3_idx');
@@ -27,7 +27,10 @@ return new class extends Migration
             $table->timestamp('create_at')->nullable();
             $table->timestamp('updated_at')->nullable();
 
-            $table->primary(['id', 'posts_id', 'medias_id', 'posts_status_id', 'posts_types_id']);
+            // Use single primary key 'id' for SQLite compatibility. Complex
+            // composite primary keys that include autoincrement columns will
+            // cause errors during SQLite migrations used in tests.
+            // $table->primary(['id', 'posts_id', 'medias_id', 'posts_status_id', 'posts_types_id']);
         });
     }
 

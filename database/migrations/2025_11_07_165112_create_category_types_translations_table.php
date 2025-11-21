@@ -17,11 +17,12 @@ return new class extends Migration
             $table->string('slug')->nullable();
             $table->timestamps();
             $table->unsignedBigInteger('languages_codes_id')->index('fk_category_types_translations_id1_idx');
-            $table->unsignedBigInteger('category_types_id')->unique('category_types_id_unique');
+            $table->unsignedBigInteger('category_types_id');
 
             $table->index(['category_types_id'], 'fk_category_types_translations_id2_idx');
-            $table->unique(['languages_codes_id'], 'languages_codes_id_unique');
-            $table->primary(['id', 'languages_codes_id', 'category_types_id']);
+            $table->unique(['languages_codes_id']);
+            // Use single primary key 'id' for compatibility with SQLite.
+            // $table->primary(['id', 'languages_codes_id', 'category_types_id']);
         });
     }
 

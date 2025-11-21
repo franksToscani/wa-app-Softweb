@@ -24,7 +24,8 @@ return new class extends Migration
             $table->timestamps();
             $table->unsignedBigInteger('products_id')->index('fk_discounts_id1_idx');
 
-            $table->primary(['id', 'products_id']);
+            // Use single primary key 'id' for SQLite compatibility.
+            // $table->primary(['id', 'products_id']);
         });
     }
 

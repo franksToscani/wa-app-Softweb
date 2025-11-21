@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('value')->nullable();
             $table->timestamps();
 
-            $table->primary(['id', 'product_attributes_id']);
+            // Use single primary key 'id' for SQLite compatibility.
+            // $table->primary(['id', 'product_attributes_id']);
         });
     }
 

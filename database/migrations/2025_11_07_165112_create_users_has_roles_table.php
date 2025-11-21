@@ -17,7 +17,8 @@ return new class extends Migration
             $table->unsignedBigInteger('roles_id')->index('fk_users_has_roles_id2_idx');
             $table->timestamps();
 
-            $table->primary(['id', 'users_id', 'roles_id']);
+            // Use single primary key 'id' for SQLite compatibility.
+            // $table->primary(['id', 'users_id', 'roles_id']);
         });
     }
 
