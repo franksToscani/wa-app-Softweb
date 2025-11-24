@@ -8,6 +8,7 @@ import { createApp, h } from 'vue';
 import PrimeVue from 'primevue/config';
 import Card from 'primevue/card';
 import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
 // PrimeVue icons (theme/core CSS omitted to avoid package/theme resolution issues)
 // We rely on Tailwind for most styling; keep primeicons for icons.
 import 'primeicons/primeicons.css';
@@ -30,6 +31,7 @@ createInertiaApp({
             .use(PrimeVue)
             .component('Card', Card)
             .component('PButton', Button)
+            .component('Dialog', Dialog)
             .mount(el);
     },
     progress: {

@@ -1,11 +1,25 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head } from '@inertiajs/vue3'
+import { ref } from 'vue'
 
 const props = defineProps({
     posts: { type: Array, default: () => [] },
     products: { type: Array, default: () => [] },
 })
+
+const showDialog = ref(false)
+const selectedPost = ref(null)
+
+function openPost(post) {
+    selectedPost.value = post
+    showDialog.value = true
+}
+
+function closeDialog() {
+    showDialog.value = false
+    selectedPost.value = null
+}
 </script>
 
 <template>
@@ -31,7 +45,7 @@ const props = defineProps({
                                             <template #footer>
                                                 <div class="flex items-center justify-between">
                                                     <small class="text-sm text-neutral-500">{{ new Date(post.created_at).toLocaleDateString() }}</small>
-                                                    <PButton icon="pi pi-eye" class="p-button-text" label="Apri" />
+                                                    <PButton icon="pi pi-eye" class="p-button-text" label="Apri" @click="openPost(post)" />
                                                 </div>
                                             </template>
                                         </Card>
@@ -71,5 +85,16 @@ const props = defineProps({
                 </div>
             </div>
         </div>
+        <!-- Post preview dialog -->
+        <Dialog v-model:visible="showDialog" :header="selectedPost ? selectedPost.title : ''" :modal="true" :style="{ width: '50vw' }">
+            <div v-if="selectedPost">
+                <p class="text-sm text-neutral-700" v-html="selectedPost.content"></p>
+            </div>
+            <template #footer>
+                <div class="text-right">
+                    <PButton label="Chiudi" class="p-button-text" @click="closeDialog" />
+                </div>
+            </template>
+        </Dialog>
     </AuthenticatedLayout>
 </template>

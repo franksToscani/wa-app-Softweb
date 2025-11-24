@@ -19,7 +19,8 @@ Route::get('/', function () {
 
 // render dashboard with latest 5 posts and 6 products
 Route::get('/dashboard', function () {
-    $posts = Post::orderByDesc('id')->limit(5)->get(['id', 'title', 'excerpt', 'created_at'])->toArray();
+    // include 'content' so frontend can show a full post preview in a modal
+    $posts = Post::orderByDesc('id')->limit(5)->get(['id', 'title', 'excerpt', 'content', 'created_at'])->toArray();
     $products = Product::orderByDesc('id')->limit(6)->get([
         'id',
         'sku as name',
