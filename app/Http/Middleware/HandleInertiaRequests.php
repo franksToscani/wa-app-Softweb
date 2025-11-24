@@ -29,11 +29,19 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        return [
-            ...parent::share($request),
+        // Aggiunta debug provvisoria:
+        
+        //dd('Esecuzione del middleware Inertia'); 
+        
+        return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user(),
             ],
-        ];
+            
+            // PARTE MOLTO IMPORTANTE DA AGGIUNGERE PER GESTIRE GLI ERRORI QUANDO USI BREEZE + INERTIAJS:
+            'errors' => fn () => $request->session()->get('errors')
+                ? $request->session()->get('errors')->getBag('default')->messages()
+                : (object) [],
+        ]);
     }
 }
