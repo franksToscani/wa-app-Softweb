@@ -1,34 +1,81 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
-
+namespace App\Http\Controllers\admin;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // We no longer maintain a separate admin posts index page.
-        // Redirect to the central dashboard which contains the posts list.
-        return redirect()->route('dashboard');
-    }
-
-    public function create()
-    {
-        return Inertia::render('admin/posts/Create');
-    }
-
-    public function store(Request $request)
-    {
+        // Basic validation for the main fields. We accept many nullable fields because
+        // the schema allows nulls for several columns.
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'nullable|string',
+            'excerpt' => 'nullable|string',
+            'template' => 'nullable|string|max:255',
+            'posts_types_id' => 'nullable|integer',
+            'posts_status_id' => 'nullable|integer',
+            'category_id' => 'nullable|integer',
+            'parent_id' => 'nullable|integer',
+            'users_id' => 'nullable|integer',
+            'media_id' => 'nullable|integer',
+            'views_count' => 'nullable|integer',
+            'published_at' => 'nullable|string',
+            'is_published' => 'nullable',
+            'tags' => 'nullable|string',
         ]);
 
-        // TODO: implement real storage logic (media, relations, user id, statuses)
-        // For now, redirect to the dashboard as a placeholder outcome.
-        return redirect()->route('dashboard')->with('success', 'Post creato (placeholder).');
+        $published = $request->input('published_at');
+        $publishedAt = null;
+        if ($published) {
+            try {
+                // Expecting datetime-local input like "YYYY-MM-DDTHH:MM"; normalize it.
+                $publishedAt = \Illuminate\Support\Carbon::createFromFormat('Y-m-d\\TH:i', $published)->format('Y-m-d H:i:s');
+            } catch (\Exception $e) {
+                // fallback: try native strtotime
+                $ts = strtotime($published);
+                if ($ts !== false) $publishedAt = date('Y-m-d H:i:s', $ts);
+            }
+        }
+
+        $now = now();
+
+        $insert = [
+            'posts_types_id' => $request->input('posts_types_id') ?: null,
+            'title' => $request->input('title'),
+            'content' => $request->input('content') ?: null,
+            'excerpt' => $request->input('excerpt') ?: null,
+            'template' => $request->input('template') ?: null,
+            'is_highlighted' => $request->has('is_highlighted') ? 1 : 0,
+            // Comments enabled defaulting to 1 if not provided
+            'comments_enabled' => $request->has('comments_enabled') ? 1 : 1,
+            'views_count' => $request->input('views_count') !== null ? (int) $request->input('views_count') : null,
+            'published_at' => $publishedAt,
+            'created_at' => $now,
+            'updated_at' => $now,
+            'users_id' => $request->input('users_id') ?: (auth()->check() ? auth()->id() : null),
+            'posts_status_id' => $request->input('posts_status_id') ?: null,
+            'media_id' => $request->input('media_id') ?: null,
+            'categories_id' => $request->input('category_id') ?: null,
+            'parent_id' => $request->input('parent_id') ?: null,
+        ];
+
+        $id = \Illuminate\Support\Facades\DB::table('posts')->insertGetId($insert);
+
+        // Note: tags, medias, and other relations are not fully handled here. This
+        // inserts a basic post record so the new HTML form is end-to-end functional.
+
+        return redirect()->route('dashboard')->with('success', "Post creato (ID: {$id}).");
+    }
+
+    // Other methods (create, store, etc.) can be added here as needed.
+
+    //create method
+    public function create()
+    {
+        return Inertia::render('admin/posts/Create');
     }
 }

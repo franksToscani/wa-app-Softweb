@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\PostController;
+use App\Http\Controllers\admin\PostController;
 
 // Admin routes grouped with prefix, name and middleware. We use the middleware class directly
 // so there's no need to register an alias in Kernel.php.
