@@ -96,5 +96,6 @@ function closeDialog() {
                 </div>
             </template>
         </Dialog>
+        
     </AuthenticatedLayout>
 </template>

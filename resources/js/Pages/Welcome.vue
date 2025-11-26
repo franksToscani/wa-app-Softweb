@@ -6,6 +6,7 @@ import PrimaryButton from '@/Components/PrimaryButton.vue'
 defineProps({
   canLogin: Boolean,
   canRegister: Boolean,
+  isAdmin: { type: Boolean, default: false },
   laravelVersion: { type: String, required: true },
   phpVersion: { type: String, required: true }
 })
@@ -23,7 +24,13 @@ defineProps({
 
       <nav class="flex items-center gap-3">
         <Link href="/" class="text-sm text-neutral-700 hover:text-neutral-900">Home</Link>
-        <Link v-if="$page.props.auth.user" :href="route('dashboard')" class="text-sm text-neutral-700 hover:text-neutral-900">Dashboard</Link>
+
+        <!-- If user is authenticated show admin dashboard link only for admins; do not show login -->
+        <template v-if="$page.props.auth.user">
+          <Link v-if="isAdmin" :href="route('dashboard')" class="text-sm text-neutral-700 hover:text-neutral-900">Dashboard</Link>
+        </template>
+
+        <!-- Guests: show login/register -->
         <template v-else>
           <Link v-if="canLogin" :href="route('login')" class="text-sm text-neutral-700 hover:text-neutral-900">Log in</Link>
           <Link v-if="canRegister" :href="route('register')" class="ml-3">

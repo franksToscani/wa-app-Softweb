@@ -1,0 +1,190 @@
+/* ============
+   GLOBAL LAYOUT
+============== */
+.container {
+    max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+/* Header */
+.page-header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #343a40;
+}
+
+.page-header p {
+    color: #6c757d;
+}
+
+/* ============
+   SECTION BLOCK
+============== */
+.section-block {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+    border: 1px solid #e5e7eb;
+}
+
+.section-block h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* ============
+   FORM ROWS
+============== */
+.form-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 18px;
+}
+
+.form-row label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 6px;
+}
+
+.form-row input, 
+.form-row textarea, 
+.form-row select {
+    padding: 10px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-row input:focus, 
+.form-row textarea:focus, 
+.form-row select:focus {
+    border-color: #3b82f6;
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* ============
+   VARIANTI
+============== */
+.variant-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.variant-row input {
+    flex: 1;
+}
+
+.variant-row button {
+    padding: 8px 12px;
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-add {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: #198754;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* ============
+   IMAGE PREVIEW
+============== */
+.image-preview-list {
+    margin-top: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.image-preview-list .preview {
+    width: 110px;
+    height: 110px;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    border: 1px solid #e5e7eb;
+}
+
+.image-preview-list img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ============
+   BUTTONS
+============== */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.btn-submit {
+    background: #0d6efd;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-submit:hover {
+    background: #0b5ed7;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.btn-cancel:hover {
+    background: #5c636a;
+}
+
+/* ============
+   RESPONSIVE
+============== */
+@media (max-width: 768px) {
+    .variant-row {
+        flex-direction: column;
+    }
+}
+
+
+
+/*===========
+   FIXES
+============== */
