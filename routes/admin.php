@@ -7,7 +7,6 @@ use App\Http\Controllers\Admin\PostController;
 // so there's no need to register an alias in Kernel.php.
 Route::prefix('admin')->name('admin.')->middleware(['auth','verified', \App\Http\Middleware\EnsureUserIsAdmin::class])->group(function () {
     // Resourceful routes for posts (index/create/store etc.)
-    Route::get('posts', [PostController::class, 'index'])->name('posts.index');
     Route::get('posts/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('posts', [PostController::class, 'store'])->name('posts.store');
 });

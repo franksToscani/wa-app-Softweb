@@ -65,11 +65,13 @@ Route::get('/home', function () {
 
 // render dashboard with latest 5 posts and 6 products
 Route::get('/dashboard', function () {
-    $posts = Post::orderByDesc('id')->limit(5)->get(['id', 'title', 'excerpt', 'created_at'])->toArray();
+    // include 'content' so frontend can show a full post preview in a modal
+    $posts = Post::orderByDesc('id')->limit(5)->get(['id', 'title', 'excerpt', 'content', 'created_at'])->toArray();
     $products = Product::orderByDesc('id')->limit(6)->get([
         'id',
         'sku as name',
         'regular_price as price',
+        // products table uses `create_at` (singular) in the schema; alias it to created_at
         'create_at as created_at',
     ])->toArray();
 
@@ -77,7 +79,7 @@ Route::get('/dashboard', function () {
         'posts' => $posts,
         'products' => $products,
     ]);
-})->middleware(['auth', 'verified'])->name('dashboard'); 
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 // Profile management routes
 Route::middleware('auth')->group(function () {
@@ -86,7 +88,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-
+// Debug route to check database connection info 
+Route::get('/_debug-db', function () {
+    return [
+        'default_connection' => config('database.default'),
+        'database' => config('database.connections.' . config('database.default') . '.database'),
+    ];
+});
 
 // Authentication routes
 require __DIR__.'/auth.php';

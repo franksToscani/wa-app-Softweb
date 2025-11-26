@@ -27,7 +27,7 @@ const props = defineProps({
 
       <nav class="flex items-center gap-3">
         <Link href="/" class="text-sm text-neutral-700 hover:text-neutral-900">Welcome</Link>
-        <Link v-if="$page.props.auth.user && isAdmin" :href="route('/dashboard')" class="text-sm text-neutral-700 hover:text-neutral-900">Dashboard</Link>
+        <Link v-if="$page.props.auth.user && isAdmin" :href="route('dashboard')" class="text-sm text-neutral-700 hover:text-neutral-900">Dashboard</Link>
 
         <!-- Authenticated user: show profile dropdown -->
         <div v-if="$page.props.auth.user" class="hidden sm:ms-6 sm:flex sm:items-center">

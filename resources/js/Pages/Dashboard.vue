@@ -32,7 +32,7 @@ function closeDialog() {
             <div class="flex items-center justify-between">
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">Dashboard</h2>
                 <div class="flex items-center gap-2">
-                    <Link :href="route('admin.posts.create')">
+                    <Link :href="route('admin.posts.create')" class="ml-4">
                         <PrimaryButton>New Post</PrimaryButton>
                     </Link>
                 </div>
@@ -63,8 +63,8 @@ function closeDialog() {
                             <td class="px-4 py-3 text-sm text-gray-500">{{ post.created_at ? new Date(post.created_at).toLocaleString() : '-' }}</td>
                             <td class="px-4 py-3 text-sm text-right">
                                 <div class="inline-flex items-center gap-2">
-                                    <Link :href="route('admin.posts.edit', post.id)" class="text-sm text-primary-600 hover:underline">Modifica</Link>
-                                    <Link :href="route('admin.posts.show', post.id)" class="text-sm text-neutral-600 hover:underline">Visualizza</Link>
+                                    <Link :href="route('admin.posts.index')" class="text-sm text-primary-600 hover:underline">Modifica</Link>
+                                    <Link :href="route('admin.posts.index')" class="text-sm text-neutral-600 hover:underline">Visualizza</Link>
                                 </div>
                             </td>
                         </tr>
