@@ -52,5 +52,8 @@ class DatabaseSeeder extends Seeder
         })->toArray();
 
         DB::table('users')->insert($users);
+
+        // Seed admin/posts demo data (categories, types, status, medias)
+        $this->call([\Database\Seeders\AdminPostsDemoSeeder::class]);
     }
 }

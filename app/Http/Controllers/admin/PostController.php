@@ -4,6 +4,8 @@ namespace App\Http\Controllers\admin;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class PostController extends Controller
 {
@@ -73,10 +75,49 @@ class PostController extends Controller
 
     // Other methods (create, store, etc.) can be added here as needed.
 
-    //create method
+    //create method - render server-side Blade form (populate selects)
     public function create()
     {
-        return Inertia::render('admin/posts/Create');
+        $categories = [];
+        $postsTypes = [];
+        $postsStatus = [];
+        $parents = [];
+        $users = [];
+        $medias = [];
+
+        if (Schema::hasTable('categories')) {
+            $categories = DB::table('categories')->select('id', 'name')->orderBy('name')->get();
+        }
+        if (Schema::hasTable('posts_types')) {
+            $postsTypes = DB::table('posts_types')->select('id', 'name')->orderBy('name')->get();
+        }
+        if (Schema::hasTable('posts_status')) {
+            $postsStatus = DB::table('posts_status')->select('id', 'name')->orderBy('name')->get();
+        }
+        if (Schema::hasTable('posts')) {
+            $parents = DB::table('posts')->select('id', 'title')->orderBy('title')->get();
+        }
+        if (Schema::hasTable('users')) {
+            if (Schema::hasColumn('users', 'name')) {
+                $users = DB::table('users')->select('id', 'name')->orderBy('name')->get();
+            } elseif (Schema::hasColumn('users', 'username')) {
+                $users = DB::table('users')->select('id', DB::raw('username as name'))->orderBy('username')->get();
+            } else {
+                $users = DB::table('users')->select('id', DB::raw('email as name'))->orderBy('email')->get();
+            }
+        }
+        if (Schema::hasTable('medias')) {
+            $medias = DB::table('medias')->select('id', 'file_name')->orderBy('file_name')->get();
+        }
+
+        return view('admin.posts.create', [
+            'categories' => $categories,
+            'postsTypes' => $postsTypes,
+            'postsStatus' => $postsStatus,
+            'parents' => $parents,
+            'users' => $users,
+            'medias' => $medias,
+        ]);
     }
 
     //store method
