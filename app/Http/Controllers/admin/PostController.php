@@ -78,4 +78,27 @@ class PostController extends Controller
     {
         return Inertia::render('admin/posts/Create');
     }
+
+    //store method
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'nullable|string',
+            'excerpt' => 'nullable|string',
+            'template' => 'nullable|string|max:255',
+            'posts_types_id' => 'nullable|integer',
+            'posts_status_id' => 'nullable|integer',
+            'category_id' => 'nullable|integer',
+            'parent_id' => 'nullable|integer',
+            'users_id' => 'nullable|integer',
+            'media_id' => 'nullable|integer',
+            'views_count' => 'nullable|integer',
+            'published_at' => 'nullable|string',
+            'is_published' => 'nullable',
+            'tags' => 'nullable|string',
+        ]);
+        // For now, redirect to the dashboard as a placeholder outcome.
+        return redirect()->route('dashboard')->with('success', 'Post creato (placeholder).');
+    }           
 }

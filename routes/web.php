@@ -88,14 +88,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Debug route to check database connection info 
-Route::get('/_debug-db', function () {
-    return [
-        'default_connection' => config('database.default'),
-        'database' => config('database.connections.' . config('database.default') . '.database'),
-    ];
-});
-
 // Authentication routes
 require __DIR__.'/auth.php';
 
