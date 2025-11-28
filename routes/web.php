@@ -94,13 +94,3 @@ require __DIR__.'/auth.php';
 
 // Admin routes
 require __DIR__.'/admin.php';
-
-
-// .test route to debug authentication state
-Route::get('/_debug-auth', function () {
-    return response()->json([
-        'auth_check' => auth()->check(),
-        'user' => auth()->user(),
-        'session_id' => session()->getId(),
-    ]);
-})->middleware('web');

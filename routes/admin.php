@@ -9,6 +9,19 @@ use App\Http\Controllers\admin\PostController;
 
 Route::prefix('admin')->name('admin.')->middleware(['auth','verified', \App\Http\Middleware\EnsureUserIsAdmin::class])->group(function () {
     // Resourceful routes for posts (index/create/store etc.)
+    // Index route: list posts (needed by admin.posts.index referenced in JS)
+    
+    Route::get('posts', [PostController::class, 'index'])->name('posts.index');
+    
     Route::get('posts/create', [PostController::class, 'create'])->name('posts.create');
+    
     Route::post('posts', [PostController::class, 'store'])->name('posts.store');
+    // Show single post
+    Route::get('posts/{post}', [PostController::class, 'show'])->name('posts.show');
+    // Edit form
+    Route::get('posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
+    // Update
+    Route::put('posts/{post}', [PostController::class, 'update'])->name('posts.update');
+    // Delete
+    Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 });
