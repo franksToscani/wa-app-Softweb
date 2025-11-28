@@ -15,13 +15,11 @@ import Dropdown from 'primevue/dropdown';
 import FileUpload from 'primevue/fileupload';
 import Editor from 'primevue/editor';
 
-// PrimeVue icons (theme/core CSS omitted to avoid package/theme resolution issues)
-// We rely on Tailwind for most styling; keep primeicons for icons.
+// PrimeVue icons and theme. We rely on Tailwind for most styling; keep primeicons for icons.
+// The theme entry (package @primevue/themes) provides the theme CSS. PrimeVue no longer
+// exposes a top-level "resources/primevue.min.css" in recent versions, so avoid importing it.
+import '@primevue/themes/lara'; // theme entry
 import 'primeicons/primeicons.css';
-
-import '@primevue/themes/lara';
-
-
 import 'quill/dist/quill.snow.css';
 
 
