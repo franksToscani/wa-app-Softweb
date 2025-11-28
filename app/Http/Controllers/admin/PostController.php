@@ -211,7 +211,7 @@ class PostController extends Controller
         return redirect()->route('admin.posts.index')->with('success', "Post aggiornato (ID: {$id}).");
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         if (!Schema::hasTable('posts')) {
             return redirect()->route('admin.posts.index')->with('error', 'Posts table missing.');
@@ -222,9 +222,41 @@ class PostController extends Controller
             return redirect()->route('admin.posts.index')->with('error', 'Post non trovato.');
         }
 
-        DB::table('posts')->where('id', $id)->delete();
+        // Prevent deleting a post that is referenced by other tables (foreign key constraints)
+        // e.g. products.posts_id -> posts.id. Provide a friendly error instead of an unhandled exception.
+        try {
+            // If force flag present, bypass dependency check and allow delete (DB has ON DELETE CASCADE)
+            $force = $request->input('force') ? true : false;
 
-        return redirect()->route('admin.posts.index')->with('success', 'Post eliminato.');
+            if (!$force && Schema::hasTable('products')) {
+                $dependentCount = DB::table('products')->where('posts_id', $id)->count();
+                if ($dependentCount > 0) {
+                    return redirect()->route('admin.posts.index')->with('error', "Impossibile eliminare il post: ci sono {$dependentCount} record dipendenti nella tabella products. Usa 'Elimina' con conferma per forzare la cancellazione.");
+                }
+            }
+
+            DB::table('posts')->where('id', $id)->delete();
+
+            return redirect()->route('admin.posts.index')->with('success', 'Post eliminato.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Fallback: return a readable message for FK constraint failures
+            return redirect()->route('admin.posts.index')->with('error', 'Impossibile eliminare il post a causa di vincoli di integrità referenziale. Rimuovi le dipendenze e riprova.');
+        }
+    }
+
+    /**
+     * Return dependent counts for a post (JSON).
+     */
+    public function dependents($id)
+    {
+        $counts = [];
+        if (Schema::hasTable('products')) {
+            $counts['products'] = DB::table('products')->where('posts_id', $id)->count();
+        } else {
+            $counts['products'] = 0;
+        }
+
+        return response()->json($counts);
     }
 
     public function store(Request $request)

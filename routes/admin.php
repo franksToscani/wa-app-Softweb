@@ -18,6 +18,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','verified', \App\Http
     Route::post('posts', [PostController::class, 'store'])->name('posts.store');
     // Show single post
     Route::get('posts/{post}', [PostController::class, 'show'])->name('posts.show');
+    // Endpoint to return dependent counts for a post (used by the delete confirmation UI)
+    Route::get('posts/{post}/dependents', [PostController::class, 'dependents'])->name('posts.dependents');
     // Edit form
     Route::get('posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
     // Update

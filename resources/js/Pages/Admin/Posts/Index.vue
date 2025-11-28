@@ -6,9 +6,40 @@ const props = defineProps({
     posts: { type: Array, default: () => [] },
 })
 
-function deletePost(id) {
-    if (!confirm("Sei sicuro di voler eliminare questo post?")) return;
-    router.delete(route('admin.posts.destroy', id))
+import { ref } from 'vue'
+
+const showConfirm = ref(false)
+const deletingId = ref(null)
+const dependentCounts = ref({ products: 0 })
+const processing = ref(false)
+
+async function deletePost(id) {
+    // Fetch dependent counts and show confirmation modal
+    deletingId.value = id
+    showConfirm.value = true
+    dependentCounts.value = { products: 0 }
+
+    try {
+        const res = await fetch(route('admin.posts.dependents', id), { credentials: 'same-origin' })
+        if (res.ok) {
+            dependentCounts.value = await res.json()
+        }
+    } catch (e) {
+        // ignore, show modal with zero counts
+        dependentCounts.value = { products: 0 }
+    }
+}
+
+function cancelConfirm() {
+    showConfirm.value = false
+    deletingId.value = null
+}
+
+function confirmDelete() {
+    if (!deletingId.value) return
+    processing.value = true
+    // send delete with force flag
+    router.delete(route('admin.posts.destroy', deletingId.value), { data: { force: true } })
 }
 </script>
 
@@ -92,4 +123,22 @@ function deletePost(id) {
             </div>
         </div>
     </AuthenticatedLayout>
+    <!-- Confirmation Modal -->
+    <div v-if="showConfirm" class="fixed inset-0 z-50 flex items-center justify-center">
+        <div class="absolute inset-0 bg-black opacity-50"></div>
+        <div class="relative bg-white rounded-lg shadow-lg max-w-lg w-full p-6 z-10">
+            <h3 class="text-lg font-semibold mb-2">Conferma eliminazione</h3>
+            <p class="text-sm text-gray-700 mb-4">
+                Questo post ha <strong>{{ dependentCounts.products }}</strong> prodotti dipendenti.
+                Se procedi, questi record saranno rimossi (ON DELETE CASCADE).
+            </p>
+            <div class="flex justify-end gap-3">
+                <button @click="cancelConfirm" class="px-4 py-2 rounded border">Annulla</button>
+                <button @click="confirmDelete" :disabled="processing" class="px-4 py-2 rounded bg-red-600 text-white">
+                    <span v-if="!processing">Elimina definitivamente</span>
+                    <span v-else>Eliminazione...</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </template>
