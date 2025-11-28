@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 // Welcome page route
+
 Route::get('/', function () {
     $isAdmin = false;
 

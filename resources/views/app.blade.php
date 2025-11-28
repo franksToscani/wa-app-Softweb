@@ -12,7 +12,21 @@
 
         <!-- Scripts -->
         @routes
-        @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
+        @if (app()->environment('local'))
+            {{-- In local/dev mode include Vite dev server scripts directly to avoid manifest checks. --}}
+            {{-- Use an env-driven dev URL so teams can override the dev host/port if needed. --}}
+            @php
+                // Default to localhost:5173 when VITE_DEV_URL is not set.
+                $viteDevUrl = rtrim(env('VITE_DEV_URL', 'http://localhost:5173'), '/');
+            @endphp
+            <script type="module" src="{{ $viteDevUrl }}/@@vite/client"></script>
+            <script type="module" src="{{ $viteDevUrl }}/resources/js/app.js"></script>
+            @isset($page['component'])
+                <script type="module" src="{{ $viteDevUrl }}/resources/js/Pages/{{ $page['component'] }}.vue"></script>
+            @endisset
+        @else
+            @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
+        @endif
         @inertiaHead
     </head>
     <body class="font-sans antialiased">
