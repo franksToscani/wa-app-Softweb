@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 // Welcome page route
+
 Route::get('/', function () {
     $isAdmin = false;
 
@@ -93,4 +94,3 @@ require __DIR__.'/auth.php';
 
 // Admin routes
 require __DIR__.'/admin.php';
-
