@@ -1,6 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link, useForm } from '@inertiajs/vue3'
+import Editor from '@tinymce/tinymce-vue';
+
 
 const props = defineProps({
     post: Object,
@@ -66,9 +68,34 @@ function submitForm() {
 
                 <!-- Content -->
                 <div class="mb-4">
-                    <label class="font-semibold">Contenuto *</label>
-                    <textarea v-model="form.content" class="w-full border rounded p-2 mt-1" rows="8"></textarea>
-                </div>
+                        <label class="font-semibold">Contenuto del Post*</label>
+                        <!-- Utilizzo del mio componente TinyMCE Vue -->
+                            <Editor
+                            api-key="9lqj6ji9zuqgqdhoc3vjc7bz391f9a3gubuktzkw6b82u1go"
+                            :init="{
+                                toolbar_mode: 'sliding',
+                                plugins: [
+                                // Core editing features
+                                'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'link', 'lists', 'media', 'searchreplace', 'table', 'visualblocks', 'wordcount',
+                                // Your account includes a free trial of TinyMCE premium features
+                                // Try the most popular premium features until Dec 15, 2025:
+                                'checklist', 'mediaembed', 'casechange', 'formatpainter', 'pageembed', 'a11ychecker', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'advtemplate', 'ai', 'uploadcare', 'mentions', 'tinycomments', 'tableofcontents', 'footnotes', 'mergetags', 'autocorrect', 'typography', 'inlinecss', 'markdown','importword', 'exportword', 'exportpdf'
+                                ],
+                                toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography uploadcare | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+                                tinycomments_mode: 'embedded',
+                                tinycomments_author: 'Author name',
+                                mergetags_list: [
+                                { value: 'First.Name', title: 'First Name' },
+                                { value: 'Email', title: 'Email' },
+                                ],
+                                ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+                                uploadcare_public_key: '37c19513a38f5cc80cac',
+                            }"
+                            initial-value="Welcome to TinyMCE!"
+                            />           
+                        <div v-if="form.errors.content" class="text-red-600 text-sm">{{ form.errors.content }}</div>
+                    </div>
+
 
                 <!-- Submit buttons -->
                 <div class="flex gap-3 mt-6">

@@ -1,6 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link, router } from '@inertiajs/vue3'
+import PrimaryButton from '@/Components/PrimaryButton.vue'
+
 
 const props = defineProps({
     posts: { type: Array, default: () => [] },
@@ -52,9 +54,7 @@ function confirmDelete() {
                 <h2 class="text-xl font-semibold text-gray-800">Gestione Post</h2>
 
                 <Link :href="route('admin.posts.create')">
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded">
-                        + Nuovo Post
-                    </button>
+                    <PrimaryButton>+ New Post</PrimaryButton>
                 </Link>
             </div>
         </template>
@@ -133,7 +133,7 @@ function confirmDelete() {
                 Se procedi, questi record saranno rimossi (ON DELETE CASCADE).
             </p>
             <div class="flex justify-end gap-3">
-                <button @click="cancelConfirm" class="px-4 py-2 rounded border">Annulla</button>
+                <button @click="cancelConfirm" class="px-4 py-2 rounded border">Esci</button>
                 <button @click="confirmDelete" :disabled="processing" class="px-4 py-2 rounded bg-red-600 text-white">
                     <span v-if="!processing">Elimina definitivamente</span>
                     <span v-else>Eliminazione...</span>

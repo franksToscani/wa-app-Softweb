@@ -1,6 +1,10 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link } from '@inertiajs/vue3'
+import PrimaryButton from '@/Components/PrimaryButton.vue'
+import Editor from '@tinymce/tinymce-vue';
+
+
 
 const props = defineProps({
     post: Object,
@@ -33,8 +37,12 @@ const props = defineProps({
             </div>
 
             <div class="flex gap-3 mt-6">
-                <Link :href="route('admin.posts.edit', props.post.id)" class="bg-blue-600 text-white px-4 py-2 rounded">Modifica</Link>
-                <Link :href="route('admin.posts.index')" class="px-4 py-2 rounded bg-gray-200">Indietro</Link>
+                <Link :href="route('admin.posts.edit', props.post.id)" class="ml-4">
+                    <PrimaryButton>Modifica</PrimaryButton>
+                </Link>
+                <Link :href="route('admin.posts.index')" class="ml-4">
+                    <PrimaryButton>Indietro</PrimaryButton>
+                </Link>
             </div>
         </div>
     </AuthenticatedLayout>
