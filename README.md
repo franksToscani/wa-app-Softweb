@@ -23,16 +23,36 @@
 **wa-app** è un'applicazione web Laravel-based che implementa un CMS/admin per la gestione di contenuti (Posts, Products, Media, ecc.) con un frontend moderno costruito su **Inertia.js** + **Vue 3** + **PrimeVue**.
 
 ### Caratteristiche principali
-- **Admin panel** completo per la gestione di posts, categorie, utenti, media
+
+#### 🎯 Core Features
+- **Admin Dashboard** completo con overview posts e media
 - **SPA (Single Page Application)** con Inertia.js per un'esperienza utente fluida
-- **PrimeVue UI components** per interfacce ricche e responsive
-- **Rich text editor** (Quill) per contenuti formattati
-- **Upload immagini** con preview e gestione media
-- **Gestione Media CRUD completa** con upload, preview, modifica ed eliminazione file
-- **Gestione relazioni** con cascade delete (products ↔ posts)
-- **Autenticazione** con Laravel Breeze (Inertia stack)
-- **Role-based access control** (admin middleware)
-- **Storage symlink** per accesso pubblico ai file caricati
+- **Autenticazione sicura** con Laravel Breeze (Inertia + Vue 3 stack)
+- **Role-based access control** con middleware admin per protezione route
+
+#### 📝 Gestione Posts
+- Lista posts con tabella organizzata (ID, Titolo, Excerpt, Data, Azioni)
+- Creazione/Modifica posts con rich text editor (Quill)
+- Upload immagine di copertina con preview
+- Gestione tags (text field, future normalizzazione)
+- Selezione categoria da dropdown
+- Modal conferma eliminazione con conteggio dipendenze (prodotti collegati)
+- Cascade delete automatico: eliminando un post, i prodotti associati vengono rimossi
+
+#### 🖼️ Gestione Media CRUD Completa
+- **Lista media** con tabella, thumbnails preview, dialog anteprima
+- **Upload file** con validazione (max 10MB), supporto immagini e documenti
+- **Preview in tempo reale** per immagini durante upload
+- **Modifica metadata** (nome, descrizione) mantenendo il file originale
+- **Visualizzazione dettagli** completa con info file, dimensione, tipo MIME
+- **Eliminazione** con rimozione fisica del file da storage
+- **Relazione utenti**: traccia chi ha caricato ogni file
+
+#### 🎨 UI/UX
+- **PrimeVue components** per interfacce ricche (Card, InputText, Dropdown, Editor, FileUpload, Dialog, DataTable)
+- **Tailwind CSS** per styling utility-first e responsive design
+- **Primeicons** per icone consistenti
+- **Storage symlink** per accesso pubblico sicuro ai file caricati
 
 ---
 
@@ -80,11 +100,43 @@ mysql --version
 
 ---
 
-## Installazione
+## 🚀 Quick Start (5 minuti)
+
+Per sviluppatori esperti che vogliono partire subito:
+
+```bash
+# Clone e setup
+git clone https://github.com/franksToscani/wa-app-Softweb.git wa-app
+cd wa-app
+composer install
+npm install
+
+# Configurazione
+cp .env.example .env
+php artisan key:generate
+# Modifica .env con le tue credenziali DB
+
+# Database
+php artisan migrate
+php artisan db:seed --class=DevAdminSeeder
+php artisan storage:link
+
+# Avvia server
+php artisan serve &
+npm run dev
+
+# Login: http://localhost:8000/login
+# Email: devadmin@example.com
+# Password: password
+```
+
+---
+
+## Installazione Dettagliata
 
 ### 1. Clona il repository
 ```bash
-git clone https://github.com/your-org/wa-app.git
+git clone https://github.com/franksToscani/wa-app-Softweb.git wa-app
 cd wa-app
 ```
 
@@ -226,12 +278,29 @@ wa-app/
 │   ├── js/
 │   │   ├── app.js              # Entry point Inertia + Vue + PrimeVue
 │   │   ├── bootstrap.js        # Axios/Echo setup
+│   │   ├── Components/         # Componenti Vue riutilizzabili
+│   │   │   ├── PrimaryButton.vue
+│   │   │   ├── InputLabel.vue
+│   │   │   ├── TextInput.vue
+│   │   │   └── InputError.vue
+│   │   ├── Layouts/            # Layout Inertia
+│   │   │   └── AuthenticatedLayout.vue
 │   │   └── Pages/              # Vue SFC pages (Inertia components)
+│   │       ├── Dashboard.vue   # Dashboard admin con overview
 │   │       ├── Admin/
-│   │       │   └── Posts/
+│   │       │   ├── Posts/
+│   │       │   │   ├── Index.vue
+│   │       │   │   ├── Create.vue
+│   │       │   │   ├── Edit.vue
+│   │       │   │   └── Show.vue
+│   │       │   └── Media/
 │   │       │       ├── Index.vue
-│   │       │       └── Create.vue
+│   │       │       ├── Create.vue
+│   │       │       ├── Edit.vue
+│   │       │       └── Show.vue
 │   │       ├── Auth/
+│   │       │   ├── Login.vue
+│   │       │   └── Register.vue
 │   │       └── ...
 │   └── views/
 │       └── app.blade.php       # Layout principale (monta Inertia)
@@ -303,13 +372,55 @@ wa-app/
 - `resources/views/app.blade.php`: layout Blade che monta l'app Inertia (tag `<div id="app" data-page="...">`).
 
 ### Componenti principali
-- **Auth/Login.vue**: pagina di login
-- **Admin/Posts/Index.vue**: lista posts con azioni (crea, modifica, elimina + modal conferma)
-- **Admin/Posts/Create.vue**: form creazione post (usa Quill editor, FileUpload, Dropdown per categoria, ecc.)
-- **Admin/Media/Index.vue**: lista media con tabella, preview thumbnails, dialog anteprima, azioni CRUD
-- **Admin/Media/Create.vue**: form upload file con preview immagini in tempo reale
-- **Admin/Media/Edit.vue**: form modifica nome/descrizione con anteprima file
-- **Admin/Media/Show.vue**: pagina dettagli completa con info file, download, visualizzazione
+
+#### Autenticazione
+- **Auth/Login.vue**: form di login con validazione e gestione errori
+- **Auth/Register.vue**: registrazione nuovi utenti
+
+#### Dashboard
+- **Dashboard.vue**: pagina principale admin con:
+  - Tabella posts recenti (ID, Titolo, Excerpt, Data creazione)
+  - Link rapidi a "Gestione Posts" e "Gestione Media"
+  - Props: `posts` (array), `products` (array)
+
+#### Gestione Posts
+- **Admin/Posts/Index.vue**: lista completa posts
+  - Tabella con colonne: ID, Titolo, Excerpt, Data, Azioni
+  - Azioni: Modifica (edit), Visualizza (show)
+  - Modal conferma eliminazione con endpoint dipendenze
+  - Pulsante "New Post" in header
+- **Admin/Posts/Create.vue**: form creazione post
+  - Quill rich text editor per contenuto
+  - Upload immagine copertina con preview
+  - Dropdown categoria (caricato da backend)
+  - Campo tags (text input)
+  - Validazione frontend e backend
+- **Admin/Posts/Edit.vue**: form modifica post esistente
+  - Pre-popolato con dati post
+  - Stessa struttura di Create
+- **Admin/Posts/Show.vue**: visualizzazione dettagli post
+
+#### Gestione Media
+- **Admin/Media/Index.vue**: lista media completa
+  - Tabella: Anteprima, Nome, Tipo, Dimensione, Data, Azioni
+  - Thumbnails immagini (12x12) cliccabili per preview
+  - Dialog modale per preview immagini full-size
+  - Azioni: Visualizza, Modifica, Elimina
+  - Formattazione dimensioni file (B, KB, MB)
+- **Admin/Media/Create.vue**: upload file
+  - Input file con supporto immagini/documenti
+  - Preview real-time per immagini
+  - Campo nome (auto-popolato dal filename)
+  - Campo descrizione opzionale
+  - Validazione: max 10MB
+- **Admin/Media/Edit.vue**: modifica metadata
+  - Anteprima file corrente
+  - Modifica nome e descrizione
+  - Info file: tipo MIME, dimensione, URL
+- **Admin/Media/Show.vue**: dettagli completi
+  - Preview/anteprima file
+  - Tutte le informazioni: nome, filename, tipo, dimensione, URL, date
+  - Azioni: Download, Apri in nuova tab, Elimina
 
 ### Stili
 - **Tailwind CSS**: utility-first CSS (configurato in `tailwind.config.js`)
@@ -357,26 +468,95 @@ I file compilati saranno in `public/build`. Laravel caricherà questi asset inve
 - **update**: aggiorna nome e descrizione media
 - **destroy**: elimina media e file fisico da storage
 
+### Modelli (Eloquent)
+
+#### User (`app/Models/User.php`)
+- Autenticazione standard Laravel
+- Relazione `roles()` (many-to-many via `users_has_roles`)
+- Relazione `posts()` (one-to-many)
+- Relazione `uploadedMedia()` (one-to-many verso Media)
+
+#### Post (`app/Models/Post.php`)
+- Fillable: `title`, `slug`, `content`, `excerpt`, `category_id`, `user_id`, `media_id`, `tags`, `published_at`
+- Relazione `category()` (belongs-to)
+- Relazione `user()` (belongs-to)
+- Relazione `media()` (belongs-to - immagine copertina)
+- Relazione `products()` (one-to-many con cascade delete)
+- Cast: `published_at` → `datetime`, `tags` → `array` (optional)
+
+#### Media (`app/Models/Media.php`)
+- Table: `medias` (plurale)
+- Fillable: `name`, `file_name`, `file_path`, `url`, `mime_type`, `size`, `alt_text`, `description`, `uploaded_by`
+- Relazione `uploader()` (belongs-to User)
+- Cast: `size` → `integer`, `uploaded_by` → `integer`
+- SoftDeletes abilitato
+
+#### Product (`app/Models/Product.php`)
+- Fillable: vari campi prodotto + `posts_id`
+- Relazione `post()` (belongs-to con ON DELETE CASCADE)
+- Eliminato automaticamente quando il post associato viene cancellato
+
+#### Category, Role, ecc.
+- Modelli standard per categorizzazione e RBAC
+
 ### Middleware
-- **auth**: protegge route che richiedono autenticazione
-- **admin**: verifica che l'utente abbia ruolo 'admin' (controlla pivot `users_has_roles`)
+- **auth**: protegge route che richiedono autenticazione (Laravel Breeze)
+- **verified**: verifica email confermata (opzionale)
+- **admin** (`EnsureUserIsAdmin`): verifica che l'utente abbia ruolo 'admin' tramite pivot `users_has_roles`
 
 ### Route
-- **web.php**: route pubbliche (home, ecc.)
-- **admin.php**: route admin (prefisso `/admin`, middleware `['web','auth','admin']`)
-  - Resource Posts: `posts` (index, create, store, show, edit, update, destroy)
-  - Extra Posts: `admin.posts.dependents` (GET)
-  - Resource Media: `media` (index, create, store, show, edit, update, destroy)
-    - `GET /admin/media` - Lista media
-    - `GET /admin/media/create` - Form upload
-    - `POST /admin/media` - Salva upload
-    - `GET /admin/media/{media}` - Dettagli
-    - `GET /admin/media/{media}/edit` - Form modifica
-    - `PUT /admin/media/{media}` - Aggiorna metadata
-    - `DELETE /admin/media/{media}` - Elimina
+
+#### Route Pubbliche (`routes/web.php`)
+```php
+Route::get('/', function () {
+    return Inertia::render('Welcome');
+});
+
+// Dashboard (protetto da auth)
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
+// Include route admin
+require __DIR__.'/admin.php';
+
+// Laravel Breeze auth routes
+require __DIR__.'/auth.php';
+```
+
+#### Route Admin (`routes/admin.php`)
+Prefisso: `/admin`  
+Middleware: `['auth', 'verified', EnsureUserIsAdmin::class]`  
+Name prefix: `admin.`
+
+**Posts Resource Routes:**
+```php
+GET    /admin/posts              → admin.posts.index       (lista)
+GET    /admin/posts/create       → admin.posts.create      (form)
+POST   /admin/posts              → admin.posts.store       (salva)
+GET    /admin/posts/{post}       → admin.posts.show        (dettagli)
+GET    /admin/posts/{post}/edit  → admin.posts.edit        (form edit)
+PUT    /admin/posts/{post}       → admin.posts.update      (aggiorna)
+DELETE /admin/posts/{post}       → admin.posts.destroy     (elimina)
+
+// Extra endpoint per conteggio dipendenze
+GET    /admin/posts/{post}/dependents → admin.posts.dependents
+```
+
+**Media Resource Routes:**
+```php
+GET    /admin/media              → admin.media.index       (lista)
+GET    /admin/media/create       → admin.media.create      (form upload)
+POST   /admin/media              → admin.media.store       (salva file)
+GET    /admin/media/{media}      → admin.media.show        (dettagli)
+GET    /admin/media/{media}/edit → admin.media.edit        (form edit)
+PUT    /admin/media/{media}      → admin.media.update      (aggiorna metadata)
+DELETE /admin/media/{media}      → admin.media.destroy     (elimina + file)
+```
 
 ### Validazione
-Esempio (PostController@store):
+
+#### PostController@store
 ```php
 $validated = $request->validate([
     'title' => 'required|string|max:255',
@@ -387,6 +567,39 @@ $validated = $request->validate([
     'tags' => 'nullable', // array o stringa
     'published' => 'boolean',
 ]);
+```
+
+#### MediaController@store
+```php
+$validated = $request->validate([
+    'file' => 'required|file|max:10240', // max 10MB
+    'name' => 'nullable|string|max:255',
+    'description' => 'nullable|string',
+]);
+
+// Salvataggio
+$file = $request->file('file');
+$path = $file->store('media', 'public');
+
+$media = Media::create([
+    'name' => $validated['name'] ?? $file->getClientOriginalName(),
+    'file_name' => $file->getClientOriginalName(),
+    'file_path' => $path,
+    'url' => Storage::url($path),
+    'mime_type' => $file->getMimeType(),
+    'size' => $file->getSize(),
+    'uploaded_by' => Auth::id(),
+]);
+```
+
+#### MediaController@update
+```php
+$validated = $request->validate([
+    'name' => 'required|string|max:255',
+    'description' => 'nullable|string',
+]);
+
+$media->update($validated);
 ```
 
 ### Upload e Storage
@@ -652,6 +865,51 @@ php artisan migrate --path=database/migrations/2025_11_28_105000_add_tags_to_pos
 - Verifica che la route usi `middleware('web')`
 - Controlla `.env`: `SESSION_DRIVER=file` e permessi su `storage/framework/sessions`
 
+### Problema: "SQLSTATE[42S01]: Base table or view already exists"
+**Causa**: migration già eseguita in precedenza  
+**Soluzione**:
+```bash
+# Esegui solo migration specifiche non ancora migrate
+php artisan migrate --path=database/migrations/YYYY_MM_DD_HHMMSS_migration_name.php
+
+# Oppure resetta tutto (ATTENZIONE: cancella dati!)
+php artisan migrate:fresh --seed
+```
+
+### Problema: Namespace controller 'admin' vs 'Admin'
+**Causa**: Laravel PSR-4 richiede namespace PascalCase  
+**Soluzione**:
+- Assicurati che controller siano in `app/Http/Controllers/Admin/` (con A maiuscola)
+- Namespace nei file: `namespace App\Http\Controllers\Admin;`
+- Import nelle route: `use App\Http\Controllers\Admin\MediaController;`
+
+### Problema: File upload non funziona / 404 su immagini
+**Causa**: symlink storage non creato  
+**Soluzione**:
+```bash
+php artisan storage:link
+# Verifica con: ls -la public/storage
+# Deve mostrare: public/storage -> ../storage/app/public
+```
+
+### Problema: "Class 'Media' not found" o model non trovato
+**Causa**: model non importato o namespace errato  
+**Soluzione**:
+```php
+// In cima al controller
+use App\Models\Media;
+use App\Models\Post;
+```
+
+### Problema: Permessi Git "insufficient permission for adding object"
+**Causa**: .git/objects ha ownership errato  
+**Soluzione**:
+```bash
+sudo chown -R $USER:$USER /path/to/wa-app/.git
+# Oppure per tutti i file:
+sudo chown -R $USER:$USER /path/to/wa-app
+```
+
 ---
 
 ## Contribuire
@@ -698,37 +956,238 @@ Questo progetto è distribuito con licenza MIT. Vedi file `LICENSE` per dettagli
 
 ---
 
-## Contatti
+## 🔮 Features Roadmap
 
-- **Maintainer**: [Softweb]
-- **Email**: [tua email]
+### Pianificate per v1.2
+- [ ] **Gestione Products** CRUD completa (simile a Posts/Media)
+- [ ] **Gestione Categories** con CRUD e gerarchia
+- [ ] **Tag System normalizzato** (tabella dedicata invece di text field)
+- [ ] **Media Library picker** per selezione immagini da Posts
+- [ ] **Bulk operations** per Media (eliminazione multipla, cambio metadata)
+- [ ] **Search & Filter** avanzato per Posts e Media
+- [ ] **Pagination** per liste lunghe (Posts, Media, Products)
+
+### Pianificate per v1.3
+- [ ] **API REST** per Posts e Media (con Laravel Sanctum)
+- [ ] **Image optimization** automatica al upload (thumbs, resize)
+- [ ] **Drag & Drop** upload multiplo per Media
+- [ ] **WYSIWYG editor** migliorato (integrazione Media Library)
+- [ ] **User management** CRUD per admin
+- [ ] **Activity Log** per tracciare modifiche
+
+### Pianificate per v2.0
+- [ ] **Multi-language support** (i18n per frontend e contenuti)
+- [ ] **Advanced RBAC** (permissions granulari oltre admin/user)
+- [ ] **Comments system** per Posts
+- [ ] **SEO tools** (meta tags, sitemap, schema.org)
+- [ ] **Analytics dashboard** (views, popular posts, storage usage)
+- [ ] **Export/Import** contenuti (CSV, JSON)
+
+### Considerazioni Future
+- [ ] **Redis cache** per performance
+- [ ] **Queue system** per task pesanti (image processing, notifications)
+- [ ] **Elasticsearch** per search avanzato
+- [ ] **CDN integration** per file statici
+- [ ] **Docker setup** completo (Laravel Sail)
+
+---
+
+## 📡 API Endpoints (Future)
+
+> **Nota**: API REST non ancora implementata. Attualmente solo Inertia/Blade rendering.
+
+Pianificazione API v1 (Laravel Sanctum):
+
+```
+GET    /api/v1/posts              # Lista posts pubblici
+GET    /api/v1/posts/{id}         # Dettagli post
+GET    /api/v1/media              # Lista media (admin only)
+POST   /api/v1/media              # Upload media (admin only)
+GET    /api/v1/categories         # Lista categorie
+```
+
+Autenticazione pianificata: **Bearer Token** (Sanctum)
+
+---
+
+## 🤝 Contribuire
+
+### Workflow Git
+1. **Fork** il repository
+2. **Crea un branch** per la tua feature:
+   ```bash
+   git checkout -b feature/nome-feature
+   ```
+3. **Commit** le modifiche (segui Conventional Commits):
+   ```bash
+   git add .
+   git commit -m "feat: aggiunge funzionalità X"
+   ```
+4. **Push** al tuo fork:
+   ```bash
+   git push origin feature/nome-feature
+   ```
+5. **Apri una Pull Request** su GitHub
+
+### Convenzioni
+- **Commit messages**: segui [Conventional Commits](https://www.conventionalcommits.org/)
+  - `feat:` nuova feature
+  - `fix:` bug fix
+  - `docs:` documentazione
+  - `refactor:` refactoring (no breaking changes)
+  - `test:` aggiunta test
+  - `chore:` maintenance (dipendenze, build, ecc.)
+- **Code style**: 
+  - PHP: PSR-12 (usa `php-cs-fixer` o Laravel Pint)
+  - JavaScript/Vue: ESLint config (Prettier per formatting)
+- **Test**: aggiungi test per nuove feature (coverage minimo 70%)
+- **Documentation**: aggiorna README se aggiungi feature o cambi API
+
+### Checklist PR
+- [ ] Ho testato localmente le modifiche
+- [ ] Ho eseguito `php artisan test` (tutti i test passano)
+- [ ] Ho eseguito `npm run build` (no errori di build)
+- [ ] Ho aggiornato la documentazione se necessario
+- [ ] Ho seguito le convenzioni di commit
+- [ ] Non ho committato `.env` o file sensibili
+- [ ] Ho aggiunto entry al CHANGELOG se applicabile
+
+### Setup Ambiente Sviluppo
+```bash
+# Installa dev dependencies
+composer install --dev
+npm install --save-dev
+
+# Configura pre-commit hooks (opzionale)
+composer require --dev barryvdh/laravel-ide-helper
+php artisan ide-helper:generate
+php artisan ide-helper:models
+
+# Abilita debug
+# In .env:
+APP_DEBUG=true
+LOG_LEVEL=debug
+```
+
+---
+
+## 📞 Contatti
+
+- **Maintainer**: Softweb Team
 - **Repository**: https://github.com/franksToscani/wa-app-Softweb
 - **Issues**: https://github.com/franksToscani/wa-app-Softweb/issues
+- **Discussions**: https://github.com/franksToscani/wa-app-Softweb/discussions
+
+Per bug report, usa GitHub Issues con template:
+```markdown
+**Descrizione Bug:**
+Breve descrizione
+
+**Per Riprodurre:**
+1. Vai su '...'
+2. Clicca su '...'
+3. Vedi errore
+
+**Comportamento Atteso:**
+Cosa dovrebbe succedere
+
+**Screenshots:**
+Se applicabile
+
+**Ambiente:**
+- OS: [es. Ubuntu 22.04]
+- PHP: [es. 8.2.10]
+- Laravel: [es. 12.36.1]
+- Browser: [es. Chrome 120]
+```
 
 ---
 
 ## Changelog
 
-### [Unreleased]
-- **Gestione Media CRUD completa** (3 dicembre 2025)
-  - Aggiunto MediaController con tutti i metodi CRUD
-  - Create 4 pagine Vue (Index, Create, Edit, Show) in Admin/Media
-  - Tabella medias estesa con campi: name, url, description, uploaded_by
-  - Upload file con validazione (max 10MB), preview immagini
-  - Dialog anteprima nella lista, eliminazione file fisico su delete
-  - Route admin/media con tutte le operazioni CRUD
-  - Fix namespace controller (admin → Admin) per conformità PSR-4
-  - Migration per aggiungere colonne mancanti alla tabella medias esistente
-  - Storage symlink configurato per accesso pubblico ai file
-- Aggiunta pagina admin posts (index/create)
-- Gestione tags in posts
-- Modal conferma eliminazione con conteggio dipendenze
-- Migration per ON DELETE CASCADE su products.posts_id
-- Fix import PrimeVue/Vite
-- Seeder DevAdminSeeder per test rapidi
+### [1.1.0] - 3 Dicembre 2025
 
-### [1.0.0] - YYYY-MM-DD
-- Release iniziale
+#### 🎉 Nuove Funzionalità
+**Gestione Media CRUD Completa**
+- ✅ MediaController con tutti i metodi CRUD (index, create, store, show, edit, update, destroy)
+- ✅ 4 pagine Vue complete in `Admin/Media/`: Index, Create, Edit, Show
+- ✅ Upload file con validazione (max 10MB)
+- ✅ Preview real-time per immagini durante upload
+- ✅ Thumbnails preview nella lista (12x12) con click per fullscreen
+- ✅ Dialog modale per anteprima immagini
+- ✅ Modifica metadata (nome, descrizione) senza modificare file
+- ✅ Eliminazione media con rimozione fisica file da storage
+- ✅ Relazione `uploaded_by` con tabella users
+- ✅ Formattazione dimensioni file (B/KB/MB) nelle viste
+
+**Dashboard Admin**
+- ✅ Pagina Dashboard.vue con overview posts e prodotti
+- ✅ Link rapidi "Gestione Posts" e "Gestione Media"
+- ✅ Tabella posts recenti con info principali
+
+#### 🔧 Miglioramenti Tecnici
+- ✅ Fix namespace controller: `admin` → `Admin` (conformità PSR-4)
+- ✅ Migration `2025_12_03_111053_add_missing_columns_to_medias_table.php`
+  - Aggiunge colonne: `name`, `url`, `description`, `uploaded_by`
+  - Foreign key `uploaded_by` → `users.id` con ON DELETE SET NULL
+- ✅ Configurato Model Media con:
+  - `$table = 'medias'` (usa tabella esistente plurale)
+  - Fillable fields aggiornati
+  - Relazione `uploader()` con User
+- ✅ Storage symlink configurato (`php artisan storage:link`)
+- ✅ Route admin/media complete con naming convention
+
+#### 📝 Documentazione
+- ✅ README aggiornato con:
+  - Sezione Media Management completa
+  - Spiegazione symlink storage
+  - Dettagli route admin
+  - Esempi validazione
+  - Struttura progetto espansa
+
+### [1.0.0] - Novembre 2025
+
+#### 🚀 Release Iniziale
+**Gestione Posts**
+- ✅ PostController CRUD completo
+- ✅ Pagine Vue: Index, Create, Edit, Show
+- ✅ Rich text editor Quill
+- ✅ Upload immagine copertina
+- ✅ Gestione tags (colonna text)
+- ✅ Selezione categoria da dropdown
+- ✅ Modal conferma eliminazione con endpoint dipendenze
+- ✅ Endpoint `admin.posts.dependents` per conteggio prodotti
+
+**Database**
+- ✅ Migration `add_tags_to_posts_table` (colonna tags text nullable)
+- ✅ Migration `update_products_posts_fk_cascade` (ON DELETE CASCADE)
+- ✅ Seeder DevAdminSeeder (admin di sviluppo: devadmin@example.com / password)
+- ✅ Relazioni Eloquent: Post ↔ Product con cascade delete
+
+**Frontend Setup**
+- ✅ Inertia.js + Vue 3 + PrimeVue stack
+- ✅ Vite 7 con HMR
+- ✅ Tailwind CSS 3
+- ✅ PrimeVue components (Card, InputText, Dropdown, Editor, FileUpload, Dialog)
+- ✅ Layout AuthenticatedLayout.vue
+- ✅ Componenti riutilizzabili (PrimaryButton, InputLabel, TextInput, InputError)
+
+**Autenticazione & RBAC**
+- ✅ Laravel Breeze (Inertia stack)
+- ✅ Middleware EnsureUserIsAdmin
+- ✅ Tabelle: users, roles, users_has_roles
+- ✅ Route protette con middleware auth + admin
+
+**Infrastruttura**
+- ✅ PHP 8.4.15 + Laravel 12.36.1
+- ✅ MySQL 8.0+ / MariaDB 10.5+
+- ✅ Node.js 18.x/20.x + npm
+- ✅ Composer 2.x
+
+#### 🐛 Bug Fix
+- ✅ Fix import PrimeVue/Vite per evitare CORS errors
+- ✅ Risolti problemi con Inertia component mounting
+- ✅ Fix session cookie per HTTPS in produzione
 
 ---
 
