@@ -32,8 +32,8 @@ function closeDialog() {
             <div class="flex items-center justify-between">
                 <h2 class="text-xl font-semibold leading-tight text-gray-800">Dashboard</h2>
                 <div class="flex items-center gap-2">
-                    <Link :href="route('admin.posts.create')" class="ml-4">
-                        <PrimaryButton>New Post</PrimaryButton>
+                    <Link :href="route('admin.posts.index')" class="ml-4">
+                        <PrimaryButton>Gestione Posts</PrimaryButton>
                     </Link>
                 </div>
 
