@@ -65,7 +65,7 @@ class RegisteredUserController extends Controller
                 'ip' => $request->ip(),
             ]);
 
-            return redirect(route('dashboard', absolute: false));
+            return redirect()->route('welcome');
         } catch (\Throwable $e) {
             // Log the failure for debugging (don't include request body with password)
             Log::error('Registration failed', [

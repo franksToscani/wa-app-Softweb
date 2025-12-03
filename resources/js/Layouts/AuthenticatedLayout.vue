@@ -7,6 +7,10 @@ import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
 import { Link } from '@inertiajs/vue3';
 
+defineProps({
+    isAdmin: { type: Boolean, default: false }
+});
+
 const showingNavigationDropdown = ref(false);
 </script>
 
@@ -22,7 +26,7 @@ const showingNavigationDropdown = ref(false);
                         <div class="flex">
                             <!-- Logo -->
                             <div class="flex shrink-0 items-center">
-                                <Link :href="route('home')">
+                                <Link :href="route('welcome')">
                                     <ApplicationLogo
                                         class="block h-9 w-auto fill-current text-gray-800"
                                     />
@@ -33,8 +37,9 @@ const showingNavigationDropdown = ref(false);
                             <div
                                 class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex"
                             >
-                                <NavLink :href="route('home')" :active="route().current('home')">Home</NavLink>
+                                <NavLink :href="route('welcome')" :active="route().current('welcome')">Welcome</NavLink>
                                 <NavLink
+                                    v-if="isAdmin"
                                     :href="route('dashboard')"
                                     :active="route().current('dashboard')"
                                 >
@@ -44,8 +49,8 @@ const showingNavigationDropdown = ref(false);
                         </div>
 
                         <div class="hidden sm:ms-6 sm:flex sm:items-center">
-                            <!-- Settings Dropdown -->
-                            <div class="relative ms-3">
+                            <!-- Settings Dropdown per utenti autenticati -->
+                            <div v-if="$page.props.auth.user" class="relative ms-3">
                                 <Dropdown align="right" width="48">
                                     <template #trigger>
                                         <span class="inline-flex rounded-md">
@@ -86,6 +91,21 @@ const showingNavigationDropdown = ref(false);
                                         </DropdownLink>
                                     </template>
                                 </Dropdown>
+                            </div>
+                            <!-- Link Login/Register per ospiti -->
+                            <div v-else class="flex items-center gap-3">
+                                <Link
+                                    :href="route('login')"
+                                    class="text-sm font-medium text-gray-700 hover:text-gray-900"
+                                >
+                                    Log in
+                                </Link>
+                                <Link
+                                    :href="route('register')"
+                                    class="inline-flex items-center rounded-md bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                >
+                                    Register
+                                </Link>
                             </div>
                         </div>
 
@@ -141,8 +161,9 @@ const showingNavigationDropdown = ref(false);
                     class="sm:hidden"
                 >
                     <div class="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink :href="route('home')" :active="route().current('home')">Home</ResponsiveNavLink>
+                        <ResponsiveNavLink :href="route('welcome')" :active="route().current('welcome')">Welcome</ResponsiveNavLink>
                         <ResponsiveNavLink
+                            v-if="isAdmin"
                             :href="route('dashboard')"
                             :active="route().current('dashboard')"
                         >
@@ -152,6 +173,7 @@ const showingNavigationDropdown = ref(false);
 
                     <!-- Responsive Settings Options -->
                     <div
+                        v-if="$page.props.auth.user"
                         class="border-t border-gray-200 pb-1 pt-4"
                     >
                         <div class="px-4">
@@ -175,6 +197,20 @@ const showingNavigationDropdown = ref(false);
                                 as="button"
                             >
                                 Log Out
+                            </ResponsiveNavLink>
+                        </div>
+                    </div>
+                    <!-- Responsive Login/Register per ospiti -->
+                    <div
+                        v-else
+                        class="border-t border-gray-200 pb-3 pt-4"
+                    >
+                        <div class="space-y-1 px-4">
+                            <ResponsiveNavLink :href="route('login')">
+                                Log in
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink :href="route('register')">
+                                Register
                             </ResponsiveNavLink>
                         </div>
                     </div>

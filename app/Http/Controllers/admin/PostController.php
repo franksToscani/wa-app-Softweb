@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
@@ -212,8 +213,7 @@ class PostController extends Controller
             'comments_enabled' => $request->has('comments_enabled') ? 1 : 1,
             'views_count' => $request->input('views_count') !== null ? (int) $request->input('views_count') : null,
             'published_at' => $publishedAt,
-            'updated_at' => $now,
-            'users_id' => $request->input('users_id') ?: (auth()->check() ? auth()->id() : null),
+            'users_id' => $request->input('users_id') ?: (Auth::check() ? Auth::id() : null),
             'posts_status_id' => $request->input('posts_status_id') ?: null,
             'media_id' => $mediaId,
             'categories_id' => $request->input('category_id') ?: null,
@@ -348,7 +348,7 @@ class PostController extends Controller
             'published_at' => $publishedAt,
             'created_at' => $now,
             'updated_at' => $now,
-            'users_id' => $request->input('users_id') ?: (auth()->check() ? auth()->id() : null),
+            'users_id' => $request->input('users_id') ?: (Auth::check() ? Auth::id() : null),
             'posts_status_id' => $request->input('posts_status_id') ?: null,
             'media_id' => $mediaId,
             'categories_id' => $request->input('category_id') ?: null,

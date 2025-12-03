@@ -60,7 +60,7 @@ function onFileSelect(event) {
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                         Crea Nuovo Post
+                        Crea Nuovo Post
                     </h2>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
                         Crea un nuovo Posts per il sito
