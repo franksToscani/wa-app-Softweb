@@ -28,9 +28,11 @@
 - **PrimeVue UI components** per interfacce ricche e responsive
 - **Rich text editor** (Quill) per contenuti formattati
 - **Upload immagini** con preview e gestione media
+- **Gestione Media CRUD completa** con upload, preview, modifica ed eliminazione file
 - **Gestione relazioni** con cascade delete (products ↔ posts)
 - **Autenticazione** con Laravel Breeze (Inertia stack)
 - **Role-based access control** (admin middleware)
+- **Storage symlink** per accesso pubblico ai file caricati
 
 ---
 
@@ -264,7 +266,8 @@ wa-app/
 - **categories**: categorie per posts
 - **posts_types**: tipi di post (articolo, pagina, ecc.)
 - **posts_status**: stati (draft, published, archived)
-- **medias**: file media (immagini, video)
+- **medias**: file media (immagini, video, documenti)
+  - Campi: `id`, `name`, `file_name`, `file_path`, `url`, `mime_type`, `size`, `alt_text`, `description`, `uploaded_by`
 - **products**: prodotti (referenziano posts)
 - **tags**: (colonna text in posts, normalizzabile in futuro)
 
@@ -276,8 +279,10 @@ wa-app/
 - `posts.media_id` → `medias.id`
 
 ### Migrations notevoli
+- **2025_11_07_165112_create_medias_table.php**: crea tabella medias con campi base
 - **2025_11_28_105000_add_tags_to_posts_table.php**: aggiunge colonna `tags` (text nullable)
 - **2025_11_28_110500_update_products_posts_fk_cascade.php**: modifica FK `products.posts_id` per ON DELETE CASCADE
+- **2025_12_03_111053_add_missing_columns_to_medias_table.php**: aggiunge campi `name`, `url`, `description`, `uploaded_by` alla tabella medias
 
 ### Seeder
 - **DatabaseSeeder**: popola demo data (utenti, ruoli, posts, categorie, ecc.)
@@ -301,6 +306,10 @@ wa-app/
 - **Auth/Login.vue**: pagina di login
 - **Admin/Posts/Index.vue**: lista posts con azioni (crea, modifica, elimina + modal conferma)
 - **Admin/Posts/Create.vue**: form creazione post (usa Quill editor, FileUpload, Dropdown per categoria, ecc.)
+- **Admin/Media/Index.vue**: lista media con tabella, preview thumbnails, dialog anteprima, azioni CRUD
+- **Admin/Media/Create.vue**: form upload file con preview immagini in tempo reale
+- **Admin/Media/Edit.vue**: form modifica nome/descrizione con anteprima file
+- **Admin/Media/Show.vue**: pagina dettagli completa con info file, download, visualizzazione
 
 ### Stili
 - **Tailwind CSS**: utility-first CSS (configurato in `tailwind.config.js`)
@@ -339,6 +348,15 @@ I file compilati saranno in `public/build`. Laravel caricherà questi asset inve
 - **destroy**: elimina post (con flag `force` per bypass controllo dipendenze)
 - **dependents**: endpoint JSON che restituisce conteggio di prodotti dipendenti (usato dalla modal di conferma)
 
+#### MediaController (`app/Http/Controllers/admin/MediaController.php`)
+- **index**: lista media con ordinamento per data (Inertia render)
+- **create**: mostra form upload (Inertia render)
+- **store**: valida e salva file media, genera URL pubblico, supporta file fino a 10MB
+- **show**: visualizza dettagli media con preview (Inertia render)
+- **edit**: mostra form modifica metadata (Inertia render)
+- **update**: aggiorna nome e descrizione media
+- **destroy**: elimina media e file fisico da storage
+
 ### Middleware
 - **auth**: protegge route che richiedono autenticazione
 - **admin**: verifica che l'utente abbia ruolo 'admin' (controlla pivot `users_has_roles`)
@@ -346,8 +364,16 @@ I file compilati saranno in `public/build`. Laravel caricherà questi asset inve
 ### Route
 - **web.php**: route pubbliche (home, ecc.)
 - **admin.php**: route admin (prefisso `/admin`, middleware `['web','auth','admin']`)
-  - Resource: `posts` (index, create, store, show, edit, update, destroy)
-  - Extra: `admin.posts.dependents` (GET)
+  - Resource Posts: `posts` (index, create, store, show, edit, update, destroy)
+  - Extra Posts: `admin.posts.dependents` (GET)
+  - Resource Media: `media` (index, create, store, show, edit, update, destroy)
+    - `GET /admin/media` - Lista media
+    - `GET /admin/media/create` - Form upload
+    - `POST /admin/media` - Salva upload
+    - `GET /admin/media/{media}` - Dettagli
+    - `GET /admin/media/{media}/edit` - Form modifica
+    - `PUT /admin/media/{media}` - Aggiorna metadata
+    - `DELETE /admin/media/{media}` - Elimina
 
 ### Validazione
 Esempio (PostController@store):
@@ -363,10 +389,15 @@ $validated = $request->validate([
 ]);
 ```
 
-### Upload
-- File salvati in `storage/app/public/posts` via `Storage::disk('public')->putFile('posts', $file)`
-- Path salvato nella colonna `path` della tabella `medias`
-- Symlink `public/storage → storage/app/public` creato con `php artisan storage:link`
+### Upload e Storage
+- **Upload Posts**: File salvati in `storage/app/public/posts` via `Storage::disk('public')->putFile('posts', $file)`
+- **Upload Media**: File salvati in `storage/app/public/media` con validazione (max 10MB)
+- Path salvato nella colonna `file_path` della tabella `medias`
+- URL pubblico generato automaticamente con `Storage::url($path)`
+- **Symlink**: `public/storage → storage/app/public` creato con `php artisan storage:link`
+  - Il symlink è un collegamento simbolico che rende i file in `storage/app/public` accessibili via web
+  - URL esempio: `http://tuosito.com/storage/media/abc123.jpg` punta a `storage/app/public/media/abc123.jpg`
+  - Vantaggi: sicurezza (storage fuori da public), organizzazione, backup semplificato
 
 ---
 
@@ -669,7 +700,7 @@ Questo progetto è distribuito con licenza MIT. Vedi file `LICENSE` per dettagli
 
 ## Contatti
 
-- **Maintainer**: [Il tuo nome]
+- **Maintainer**: [Softweb]
 - **Email**: [tua email]
 - **Repository**: https://github.com/franksToscani/wa-app-Softweb
 - **Issues**: https://github.com/franksToscani/wa-app-Softweb/issues
@@ -679,6 +710,16 @@ Questo progetto è distribuito con licenza MIT. Vedi file `LICENSE` per dettagli
 ## Changelog
 
 ### [Unreleased]
+- **Gestione Media CRUD completa** (3 dicembre 2025)
+  - Aggiunto MediaController con tutti i metodi CRUD
+  - Create 4 pagine Vue (Index, Create, Edit, Show) in Admin/Media
+  - Tabella medias estesa con campi: name, url, description, uploaded_by
+  - Upload file con validazione (max 10MB), preview immagini
+  - Dialog anteprima nella lista, eliminazione file fisico su delete
+  - Route admin/media con tutte le operazioni CRUD
+  - Fix namespace controller (admin → Admin) per conformità PSR-4
+  - Migration per aggiungere colonne mancanti alla tabella medias esistente
+  - Storage symlink configurato per accesso pubblico ai file
 - Aggiunta pagina admin posts (index/create)
 - Gestione tags in posts
 - Modal conferma eliminazione con conteggio dipendenze

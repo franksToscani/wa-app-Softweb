@@ -42,6 +42,7 @@ class MediaController extends Controller
             'description' => 'nullable|string',
         ]);
         
+        //Uso dell'API di Laravel per gestire l'upload dei file    
         $file = $request->file('file');
         $path = $file->store('media', 'public');
         

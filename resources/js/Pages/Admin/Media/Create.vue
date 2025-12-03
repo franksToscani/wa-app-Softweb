@@ -102,7 +102,7 @@ function submit() {
                             v-model="form.description"
                             rows="4"
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                            placeholder="Descrizione opzionale del file"
+                            placeholder="Aggiungi una descrizione opzionale del file"
                         ></textarea>
                         <InputError :message="form.errors.description" class="mt-2" />
                     </div>
