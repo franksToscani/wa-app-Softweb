@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 // Welcome page route
-
 Route::get('/', function () {
     $isAdmin = false;
 
@@ -24,29 +23,6 @@ Route::get('/', function () {
             ->exists();
     }
 
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-        'isAdmin' => $isAdmin,
-    ]);
-});
-
-// Home page route
-Route::get('/home', function () {
-    $isAdmin = false;
-
-    if (Auth::check()) {
-        $userId = Auth::id();
-        $isAdmin = DB::table('users_has_roles')
-            ->join('roles', 'roles.id', '=', 'users_has_roles.roles_id')
-            ->where('users_has_roles.users_id', $userId)
-            ->whereRaw('LOWER(roles.nome) = ?', ['admin'])
-            ->exists();
-    }
-
-    // Fetch latest posts and products for the home page lists
     $posts = Post::orderByDesc('id')->limit(4)->get(['id', 'title', 'excerpt', 'created_at'])->toArray();
     $products = Product::orderByDesc('id')->limit(8)->get([
         'id',
@@ -55,14 +31,16 @@ Route::get('/home', function () {
         'create_at as created_at',
     ])->toArray();
 
-    return Inertia::render('Home', [
+    return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
         'canRegister' => Route::has('register'),
         'isAdmin' => $isAdmin,
         'posts' => $posts,
         'products' => $products,
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
     ]);
-})->name('home');
+})->name('welcome');
 
 // render dashboard with latest 5 posts and 6 products
 Route::get('/dashboard', function () {
@@ -81,6 +59,9 @@ Route::get('/dashboard', function () {
         'products' => $products,
     ]);
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+// Public post view route (accessible to everyone)
+Route::get('/posts/{id}', [\App\Http\Controllers\PostController::class, 'show'])->name('posts.show');
 
 // Profile management routes
 Route::middleware('auth')->group(function () {

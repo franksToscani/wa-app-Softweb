@@ -34,9 +34,9 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // After login, send all users to the home page. The home page will show
+        // After login, send all users to the home page (welcome). The home page will show
         // an admin-only Dashboard link when appropriate.
-        return redirect('/home');
+        return redirect()->route('welcome');
     }
 
     /**

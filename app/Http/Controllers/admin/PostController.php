@@ -7,9 +7,14 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
+    /*     
+    * Display a listing of the posts.
+     */
+
     public function index(Request $request)
     {
         $posts = [];
@@ -26,6 +31,9 @@ class PostController extends Controller
         ]);
     }
 
+    /*     
+    * Show the form for creating a new post.
+     */
     public function create()
     {
         $categories = [];
@@ -70,6 +78,9 @@ class PostController extends Controller
         ]);
     }
 
+    /*     
+    * Display the specified post.
+     */
     public function show($id)
     {
         if (!Schema::hasTable('posts')) {
@@ -96,7 +107,7 @@ class PostController extends Controller
         if (!$post) {
             return redirect()->route('admin.posts.index')->with('error', 'Post non trovato.');
         }
-
+            // le mie query per i campi select nel form di edit
         $categories = Schema::hasTable('categories') ? DB::table('categories')->select('id', 'name')->orderBy('name')->get() : [];
         $postsTypes = Schema::hasTable('posts_types') ? DB::table('posts_types')->select('id', 'name')->orderBy('name')->get() : [];
         $postsStatus = Schema::hasTable('posts_status') ? DB::table('posts_status')->select('id', 'name')->orderBy('name')->get() : [];
@@ -124,6 +135,10 @@ class PostController extends Controller
         ]);
     }
 
+
+    /*     
+        * Update the specified post in storage.
+     */
     public function update(Request $request, $id)
     {
         if (!Schema::hasTable('posts')) {
@@ -166,6 +181,7 @@ class PostController extends Controller
 
         $now = now();
 
+        // Handle cover image upload if present
         $mediaId = $request->input('media_id') ?: $post->media_id ?? null;
         if ($request->hasFile('cover_image') && $request->file('cover_image')->isValid()) {
             $file = $request->file('cover_image');
@@ -181,7 +197,7 @@ class PostController extends Controller
                 ]);
             }
         }
-
+        // Handle tags input (array to comma-separated string)
         $tags = $request->input('tags');
         if (is_array($tags)) {
             $tags = implode(',', $tags);
@@ -197,8 +213,7 @@ class PostController extends Controller
             'comments_enabled' => $request->has('comments_enabled') ? 1 : 1,
             'views_count' => $request->input('views_count') !== null ? (int) $request->input('views_count') : null,
             'published_at' => $publishedAt,
-            'updated_at' => $now,
-            'users_id' => $request->input('users_id') ?: (auth()->check() ? auth()->id() : null),
+            'users_id' => $request->input('users_id') ?: (Auth::check() ? Auth::id() : null),
             'posts_status_id' => $request->input('posts_status_id') ?: null,
             'media_id' => $mediaId,
             'categories_id' => $request->input('category_id') ?: null,
@@ -211,6 +226,11 @@ class PostController extends Controller
         return redirect()->route('admin.posts.index')->with('success', "Post aggiornato (ID: {$id}).");
     }
 
+    /*     
+        * Remove the specified post from storage.
+        * dependecy check included. 
+        * on delete cascade.    
+     */
     public function destroy(Request $request, $id)
     {
         if (!Schema::hasTable('posts')) {
@@ -259,6 +279,9 @@ class PostController extends Controller
         return response()->json($counts);
     }
 
+    /**
+     * Store a newly created post in storage.
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -291,7 +314,7 @@ class PostController extends Controller
         }
 
         $now = now();
-
+        // Handle cover image upload if present
         $mediaId = $request->input('media_id') ?: null;
         if ($request->hasFile('cover_image') && $request->file('cover_image')->isValid()) {
             $file = $request->file('cover_image');
@@ -307,7 +330,7 @@ class PostController extends Controller
                 ]);
             }
         }
-
+        // Handle tags input (array to comma-separated string)
         $tags = $request->input('tags');
         if (is_array($tags)) {
             $tags = implode(',', $tags);
@@ -325,7 +348,7 @@ class PostController extends Controller
             'published_at' => $publishedAt,
             'created_at' => $now,
             'updated_at' => $now,
-            'users_id' => $request->input('users_id') ?: (auth()->check() ? auth()->id() : null),
+            'users_id' => $request->input('users_id') ?: (Auth::check() ? Auth::id() : null),
             'posts_status_id' => $request->input('posts_status_id') ?: null,
             'media_id' => $mediaId,
             'categories_id' => $request->input('category_id') ?: null,
