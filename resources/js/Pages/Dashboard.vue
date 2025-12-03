@@ -36,6 +36,12 @@ function closeDialog() {
                         <PrimaryButton>New Post</PrimaryButton>
                     </Link>
                 </div>
+
+                <div class="flex items-center gap-2">
+                    <Link :href="route('admin.media.index')" class="ml-4">
+                        <PrimaryButton>Gestione Media</PrimaryButton>
+                    </Link>
+                </div>
             </div>
         </template>
 
