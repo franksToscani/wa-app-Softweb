@@ -806,39 +806,113 @@ php artisan migrate --path=database/migrations/YYYY_MM_DD_HHMMSS_migration_name.
 
 ## Testing
 
+### Configurazione Test Environment
+
+Il progetto è configurato per usare **SQLite in-memory** per i test, garantendo velocità e isolamento.
+
+#### Configurazione (già presente in `phpunit.xml`)
+```xml
+<env name="DB_CONNECTION" value="sqlite"/>
+<env name="DB_DATABASE" value=":memory:"/>
+<env name="DB_FOREIGN_KEYS" value="false"/>
+```
+
+**Nota importante:** Le foreign key constraints sono **disabilitate** durante i test per semplificare il setup dei dati. Questo permette di testare operazioni CRUD senza dover creare manualmente tutti i record di riferimento.
+
 ### PHPUnit (backend)
+
 ```bash
 # Esegui tutti i test
 php artisan test
 
 # Esegui test specifici
-php artisan test --filter PostControllerTest
+php artisan test tests/Feature/PostControllerTest.php
+
+# Esegui con coverage (richiede Xdebug)
+php artisan test --coverage
+
+# Esegui test con output dettagliato
+php artisan test --verbose
 ```
 
-### Test consigliati da implementare
-- **Feature test**: creazione/modifica/eliminazione post (con authentication)
-- **Unit test**: validazione input, slugify helper, ecc.
-- **Browser test (Dusk)**: flow completo di creazione post via UI
+### Test Implementati
 
-### Esempio test (da creare)
+#### Feature Tests - PostController
+File: `tests/Feature/PostControllerTest.php`
+
+**Test disponibili (8 test, 17 assertions):**
+1. ✅ `test_can_insert_post_to_database` - Verifica inserimento post
+2. ✅ `test_can_store_large_html_content` - Verifica supporto longtext per HTML esteso
+3. ✅ `test_can_retrieve_post_from_database` - Verifica lettura post
+4. ✅ `test_can_update_post_in_database` - Verifica aggiornamento post
+5. ✅ `test_can_delete_post_from_database` - Verifica eliminazione post
+6. ✅ `test_post_can_have_nullable_fields` - Verifica campi opzionali (excerpt)
+7. ✅ `test_multiple_posts_can_be_created` - Verifica creazione multipla
+8. ✅ `test_post_content_supports_html` - Verifica supporto HTML complesso
+
+**Caratteristiche:**
+- Usa `RefreshDatabase` trait per database pulito ad ogni test
+- Testa operazioni CRUD a livello database (non HTTP)
+- Verifica supporto per contenuti HTML lunghi (campo `longtext`)
+- Foreign keys disabilitate per semplificare il testing
+
+### Creare Nuovi Test
+
+#### Esempio: Feature Test con Authentication
 ```php
-// tests/Feature/Admin/PostControllerTest.php
-public function test_admin_can_create_post()
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class AdminPostTest extends TestCase
 {
-    $admin = User::factory()->create();
-    $admin->roles()->attach(Role::where('nome', 'admin')->first());
-    
-    $this->actingAs($admin)
-         ->post(route('admin.posts.store'), [
-             'title' => 'Test Post',
-             'content' => 'Content',
-             'category_id' => 1,
-         ])
-         ->assertRedirect(route('admin.posts.index'));
-    
-    $this->assertDatabaseHas('posts', ['title' => 'Test Post']);
+    use RefreshDatabase;
+
+    public function test_admin_can_access_posts_index()
+    {
+        // Nota: Con FK disabilitate, non serve creare ruoli
+        $user = User::factory()->create();
+        
+        $response = $this->actingAs($user)
+            ->get(route('admin.posts.index'));
+        
+        $response->assertStatus(200);
+    }
 }
 ```
+
+#### Esempio: Unit Test
+```php
+<?php
+
+namespace Tests\Unit;
+
+use PHPUnit\Framework\TestCase;
+use App\Helpers\SlugHelper;
+
+class SlugHelperTest extends TestCase
+{
+    public function test_generates_valid_slug()
+    {
+        $this->assertEquals(
+            'il-mio-post',
+            SlugHelper::generate('Il Mio Post!')
+        );
+    }
+}
+```
+
+### Best Practices per Testing
+
+1. **Usa RefreshDatabase** per test con database
+2. **Non fare affidamento su FK** durante i test (sono disabilitate)
+3. **Testa comportamenti, non implementazione**
+4. **Mantieni test isolati** (nessuna dipendenza tra test)
+5. **Usa factory per dati di test** quando possibile
 
 ---
 

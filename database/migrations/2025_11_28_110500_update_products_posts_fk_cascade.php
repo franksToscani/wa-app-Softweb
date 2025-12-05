@@ -16,6 +16,12 @@ return new class extends Migration
             return;
         }
 
+        // SQLite doesn't support dropping foreign keys by name
+        // Only MySQL and PostgreSQL do. Skip for SQLite.
+        if (DB::connection()->getDriverName() === 'sqlite') {
+            return;
+        }
+
         // Modify foreign key from products.posts_id -> posts.id to cascade on delete
         Schema::table('products', function (Blueprint $table) {
             try {
@@ -40,6 +46,11 @@ return new class extends Migration
     public function down(): void
     {
         if (!Schema::hasTable('products')) {
+            return;
+        }
+
+        // SQLite doesn't support dropping foreign keys by name
+        if (DB::connection()->getDriverName() === 'sqlite') {
             return;
         }
 
