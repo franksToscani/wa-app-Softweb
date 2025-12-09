@@ -1,15 +1,25 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import { Head, Link, router } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import PrimaryButton from '@/Components/PrimaryButton.vue'
 
 const props = defineProps({
-    media: { type: Array, default: () => [] }
+    media: { type: Object, default: () => ({ data: [] }) }
 })
 
 const showDialog = ref(false)
 const selectedMedia = ref(null)
+
+const items = computed(() => props.media?.data ?? [])
+const totalMedia = computed(() => props.media?.meta?.total ?? items.value.length)
+const paginationLinks = computed(() => props.media?.links ?? [])
+
+const searchTerm = ref('')
+const mimeFilter = ref('')
+const sortBy = ref('created_at')
+const sortOrder = ref('desc')
+let searchTimer = null
 
 function openPreview(item) {
     selectedMedia.value = item
@@ -26,6 +36,40 @@ function deleteMedia(media) {
         router.delete(route('admin.media.destroy', media.id))
     }
 }
+
+function buildParams(pageUrl = null) {
+    const params = {
+        'filter[name]': searchTerm.value || undefined,
+        'filter[file_name]': searchTerm.value || undefined,
+        'filter[mime_type]': mimeFilter.value || undefined,
+        sort: sortOrder.value === 'desc' ? `-${sortBy.value}` : sortBy.value,
+    }
+
+    // If navigating via pagination link, preserve that URL; otherwise use route helper
+    return { params, pageUrl }
+}
+
+function applyFilters(pageUrl = null) {
+    const { params } = buildParams(pageUrl)
+    router.get(pageUrl || route('admin.media.index'), params, {
+        preserveScroll: true,
+        preserveState: true,
+        replace: true,
+    })
+}
+
+function debouncedApply() {
+    if (searchTimer) clearTimeout(searchTimer)
+    searchTimer = setTimeout(() => applyFilters(), 350)
+}
+
+function changePage(link) {
+    if (!link.url) return
+    applyFilters(link.url)
+}
+
+watch([searchTerm, mimeFilter], debouncedApply)
+watch([sortBy, sortOrder], () => applyFilters())
 
 function formatFileSize(bytes) {
     if (!bytes) return '-'
@@ -62,11 +106,64 @@ function formatFileSize(bytes) {
         <div class="p-6">
             <div class="mb-4 flex items-center justify-between">
                 <div class="text-sm text-gray-600">
-                    Totale: <strong>{{ media.length }}</strong> file
+                    Totale: <strong>{{ totalMedia }}</strong> file
                 </div>
             </div>
 
-            <div v-if="!media || media.length === 0" class="rounded-lg border bg-white p-12 text-center">
+            <!-- Filters -->
+            <div class="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div class="flex-1 flex flex-col md:flex-row md:items-center gap-2">
+                    <div class="relative w-full md:max-w-sm">
+                        <input
+                            v-model="searchTerm"
+                            type="text"
+                            placeholder="Cerca per nome o file"
+                            class="w-full rounded-lg border border-gray-300 px-3 py-2 pl-9 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        />
+                        <svg class="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+
+                    <select
+                        v-model="mimeFilter"
+                        class="w-full md:w-48 rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    >
+                        <option value="">Tutti i tipi</option>
+                        <option value="image/jpeg">image/jpeg</option>
+                        <option value="image/png">image/png</option>
+                        <option value="image/webp">image/webp</option>
+                        <option value="application/pdf">application/pdf</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <select
+                        v-model="sortBy"
+                        class="rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    >
+                        <option value="created_at">Data</option>
+                        <option value="name">Nome</option>
+                        <option value="file_name">File</option>
+                        <option value="size">Dimensione</option>
+                    </select>
+                    <button
+                        @click="sortOrder = sortOrder === 'asc' ? 'desc' : 'asc'"
+                        class="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        type="button"
+                    >
+                        <span>{{ sortOrder === 'asc' ? 'Asc' : 'Desc' }}</span>
+                        <svg v-if="sortOrder === 'asc'" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                        </svg>
+                        <svg v-else class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div v-if="!items.length" class="rounded-lg border bg-white p-12 text-center">
                 <p class="text-gray-500">Nessun file caricato.</p>
                 <Link :href="route('admin.media.create')" class="mt-4 inline-block">
                     <PrimaryButton>Carica il primo file</PrimaryButton>
@@ -86,7 +183,7 @@ function formatFileSize(bytes) {
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 bg-white">
-                        <tr v-for="item in media" :key="item.id" class="hover:bg-gray-50">
+                        <tr v-for="item in items" :key="item.id" class="hover:bg-gray-50">
                             <td class="px-4 py-3">
                                 <div v-if="item.mime_type && item.mime_type.startsWith('image/')" class="h-12 w-12">
                                     <img 
@@ -140,6 +237,22 @@ function formatFileSize(bytes) {
                         </tr>
                     </tbody>
                 </table>
+
+                <div v-if="paginationLinks.length" class="flex flex-wrap items-center gap-2 px-4 py-3 bg-gray-50 border-t">
+                    <Link
+                        v-for="(link, idx) in paginationLinks"
+                        :key="idx"
+                        :href="link.url || '#'"
+                        preserve-scroll
+                        :class="[
+                            'px-3 py-1.5 text-sm rounded border transition-colors',
+                            link.url ? 'hover:bg-gray-100' : 'opacity-50 cursor-not-allowed',
+                            link.active ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300 text-gray-700'
+                        ]"
+                        :aria-disabled="!link.url"
+                        v-html="link.label"
+                    />
+                </div>
             </div>
         </div>
 

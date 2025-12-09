@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use App\Models\Post;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class PostController extends Controller
 {
@@ -18,7 +20,9 @@ class PostController extends Controller
             return redirect()->route('welcome')->with('error', 'Posts table missing.');
         }
 
-        $post = DB::table('posts')->where('id', $id)->first();
+        $post = QueryBuilder::for(Post::class)
+            ->where('id', $id)
+            ->first();
         
         if (!$post) {
             return redirect()->route('welcome')->with('error', 'Post non trovato.');
