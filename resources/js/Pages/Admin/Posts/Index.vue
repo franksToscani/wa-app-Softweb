@@ -5,7 +5,7 @@ import { ref, computed } from 'vue'
 import PrimaryButton from '@/Components/PrimaryButton.vue'
 
 const props = defineProps({
-    posts: { type: Array, default: () => [] },
+    posts: { type: Object, default: () => ({ data: [] }) },
 })
 
 const showConfirm = ref(false)
@@ -17,8 +17,12 @@ const searchQuery = ref('')
 const sortBy = ref('created_at')
 const sortOrder = ref('desc')
 
+const items = computed(() => props.posts?.data ?? [])
+const totalPosts = computed(() => props.posts?.meta?.total ?? items.value.length)
+const paginationLinks = computed(() => props.posts?.links ?? [])
+
 const filteredPosts = computed(() => {
-    let filtered = [...props.posts]
+    let filtered = [...items.value]
     
     if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase()
@@ -43,8 +47,8 @@ const filteredPosts = computed(() => {
 })
 
 // Computed properties for stats
-const publishedPosts = computed(() => props.posts.filter(p => p.published_at))
-const draftPosts = computed(() => props.posts.filter(p => !p.published_at))
+const publishedPosts = computed(() => items.value.filter(p => p.published_at))
+const draftPosts = computed(() => items.value.filter(p => !p.published_at))
 
 async function deletePost(id, title) {
     deletingId.value = id
@@ -104,7 +108,7 @@ function truncate(text, length = 100) {
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                         Gestione Posts
+                        Gestione Posts
                     </h2>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
                         Gestisci i tuoi posts e contenuti
@@ -124,7 +128,7 @@ function truncate(text, length = 100) {
                         <div class="flex items-center justify-between">
                             <div>
                                 <p class="text-sm font-medium opacity-90">Totale Posts</p>
-                                <p class="text-4xl font-bold mt-2">{{ posts.length }}</p>
+                                <p class="text-4xl font-bold mt-2">{{ totalPosts }}</p>
                             </div>
                             <div class="bg-white/20 backdrop-blur-sm rounded-full p-4">
                                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -293,6 +297,23 @@ function truncate(text, length = 100) {
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Pagination -->
+                <div v-if="paginationLinks.length" class="mt-10 flex flex-wrap items-center gap-2 justify-center">
+                    <Link
+                        v-for="(link, idx) in paginationLinks"
+                        :key="idx"
+                        :href="link.url || '#'"
+                        preserve-scroll
+                        :class="[
+                            'px-3 py-1.5 text-sm rounded border transition-colors',
+                            link.url ? 'hover:bg-gray-100 dark:hover:bg-gray-800' : 'opacity-50 cursor-not-allowed',
+                            link.active ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-300 text-gray-700 dark:text-gray-200'
+                        ]"
+                        :aria-disabled="!link.url"
+                        v-html="link.label"
+                    />
                 </div>
 
                 <!-- Empty State -->

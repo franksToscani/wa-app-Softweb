@@ -24,13 +24,13 @@
 
 ### Caratteristiche principali
 
-#### 🎯 Core Features
+####  Core Features
 - **Admin Dashboard** completo con overview posts e media
 - **SPA (Single Page Application)** con Inertia.js per un'esperienza utente fluida
 - **Autenticazione sicura** con Laravel Breeze (Inertia + Vue 3 stack)
 - **Role-based access control** con middleware admin per protezione route
 
-#### 📝 Gestione Posts
+#### Gestione Posts
 - Lista posts con tabella organizzata (ID, Titolo, Excerpt, Data, Azioni)
 - Creazione/Modifica posts con rich text editor (Quill)
 - Upload immagine di copertina con preview
@@ -39,7 +39,7 @@
 - Modal conferma eliminazione con conteggio dipendenze (prodotti collegati)
 - Cascade delete automatico: eliminando un post, i prodotti associati vengono rimossi
 
-#### 🖼️ Gestione Media CRUD Completa
+####  Gestione Media CRUD Completa
 - **Lista media** con tabella, thumbnails preview, dialog anteprima
 - **Upload file** con validazione (max 10MB), supporto immagini e documenti
 - **Preview in tempo reale** per immagini durante upload
@@ -48,7 +48,7 @@
 - **Eliminazione** con rimozione fisica del file da storage
 - **Relazione utenti**: traccia chi ha caricato ogni file
 
-#### 🎨 UI/UX
+####  UI/UX
 - **PrimeVue components** per interfacce ricche (Card, InputText, Dropdown, Editor, FileUpload, Dialog, DataTable)
 - **Tailwind CSS** per styling utility-first e responsive design
 - **Primeicons** per icone consistenti
@@ -76,6 +76,130 @@
 - **Composer**: 2.x
 - **npm**: 9.x o 10.x
 - **Laravel Sail** (opzionale, per Docker-based development)
+
+---
+
+##  Dipendenze Principali
+
+### Backend (Composer)
+
+#### Produzione
+```json
+{
+    "php": "^8.2",
+    "laravel/framework": "^12.0",
+    "laravel/sanctum": "^4.0",
+    "laravel/tinker": "^2.10.1",
+    "inertiajs/inertia-laravel": "^2.0",
+    "tightenco/ziggy": "^2.0"
+}
+```
+
+**Descrizione:**
+- **laravel/framework** (^12.0) - Core framework Laravel 12
+- **inertiajs/inertia-laravel** (^2.0) - Adapter Laravel per Inertia.js (SPA senza API)
+- **laravel/sanctum** (^4.0) - Autenticazione API token (per future API REST)
+- **tightenco/ziggy** (^2.0) - Helper JavaScript per route Laravel (usa `route()` in Vue)
+- **laravel/tinker** (^2.10.1) - REPL interattivo per debugging e testing
+
+#### Sviluppo
+```json
+{
+    "laravel/breeze": "^2.3",
+    "laravel/pint": "^1.24",
+    "laravel/sail": "^1.41",
+    "laravel/pail": "^1.2.2",
+    "kitlooning/laravel-migrations-generator": "^7.2",
+    "phpunit/phpunit": "^11.5.3",
+    "fakerphp/faker": "^1.23",
+    "mockery/mockery": "^1.6",
+    "nunomaduro/collision": "^8.6"
+}
+```
+
+**Descrizione:**
+- **laravel/breeze** (^2.3) - Scaffolding autenticazione con Inertia + Vue stack
+- **laravel/pint** (^1.24) - Code style fixer (PSR-12 opinionated)
+- **laravel/sail** (^1.41) - Environment Docker per sviluppo locale
+- **laravel/pail** (^1.2.2) - Tail logs Laravel in tempo reale
+- **kitlooning/laravel-migrations-generator** (^7.2) - Genera migrations da DB esistente
+- **phpunit/phpunit** (^11.5.3) - Testing framework PHP
+- **fakerphp/faker** (^1.23) - Generazione dati fake per seeding/testing
+- **mockery/mockery** (^1.6) - Mocking library per PHPUnit
+- **nunomaduro/collision** (^8.6) - Beautiful error reporting CLI
+
+---
+
+### Frontend (npm)
+
+#### Produzione
+```json
+{
+    "vue": "^3.5.24",
+    "@inertiajs/vue3": "^2.0.0",
+    "@inertiajs/inertia-vue3": "^0.6.0",
+    "primevue": "^4.5.0",
+    "@primevue/themes": "^4.5.0",
+    "primeicons": "^7.0.0",
+    "quill": "^2.0.3",
+    "@tinymce/tinymce-vue": "^6.3.0"
+}
+```
+
+**Descrizione:**
+- **vue** (^3.5.24) - Framework JavaScript reattivo (Composition API)
+- **@inertiajs/vue3** (^2.0.0) - Adapter Vue 3 per Inertia.js
+- **@inertiajs/inertia-vue3** (^0.6.0) - Plugin Inertia per Vue 3 (legacy)
+- **primevue** (^4.5.0) - UI component library (Card, InputText, Dropdown, Editor, FileUpload, Dialog, DataTable)
+- **@primevue/themes** (^4.5.0) - Temi PrimeVue (Lara, Aura, Material)
+- **primeicons** (^7.0.0) - Icon set per PrimeVue
+- **quill** (^2.0.3) - Rich text WYSIWYG editor per posts
+- **@tinymce/tinymce-vue** (^6.3.0) - Alternative editor (non attualmente usato)
+
+#### Sviluppo
+```json
+{
+    "vite": "^7.0.7",
+    "@vitejs/plugin-vue": "^6.0.0",
+    "laravel-vite-plugin": "^2.0.0",
+    "tailwindcss": "^3.2.1",
+    "@tailwindcss/forms": "^0.5.3",
+    "@tailwindcss/vite": "^4.0.0",
+    "postcss": "^8.4.31",
+    "autoprefixer": "^10.4.12",
+    "axios": "^1.13.2",
+    "concurrently": "^9.0.1"
+}
+```
+
+**Descrizione:**
+- **vite** (^7.0.7) - Module bundler ultra-veloce con HMR
+- **@vitejs/plugin-vue** (^6.0.0) - Plugin Vite per Vue SFC
+- **laravel-vite-plugin** (^2.0.0) - Integrazione Vite ↔ Laravel
+- **tailwindcss** (^3.2.1) - Utility-first CSS framework
+- **@tailwindcss/forms** (^0.5.3) - Stili Tailwind per form
+- **@tailwindcss/vite** (^4.0.0) - Plugin Vite per Tailwind v4
+- **postcss** (^8.4.31) - Processore CSS (per Tailwind)
+- **autoprefixer** (^10.4.12) - Aggiunge vendor prefixes CSS
+- **axios** (^1.13.2) - HTTP client (usato da Inertia)
+- **concurrently** (^9.0.1) - Esegui comandi npm in parallelo
+
+---
+
+
+### 🔧 Installazione Dipendenze
+
+```bash
+# Backend (Laravel)
+composer install
+
+# Frontend (Vue + Vite)
+npm install
+
+# Verifica dipendenze installate
+composer show        # Lista packages PHP
+npm list --depth=0   # Lista packages npm
+```
 
 ---
 
@@ -626,7 +750,8 @@ $media->update($validated);
    php artisan serve
    ```
 3. **Accedi all'app**: http://localhost:8000
-4. **Login come admin**: usa credenziali seeded (devadmin@example.com / password)
+4. **Login come admin**: usa credenziali (admin@example.com / password)
+5. **Login come user simplice**: usa credenziali (franks@example.com / qwerty111)
 
 ### Aggiungere una nuova pagina Inertia
 1. Crea il componente Vue in `resources/js/Pages` (es. `Admin/Products/Index.vue`)
@@ -681,39 +806,113 @@ php artisan migrate --path=database/migrations/YYYY_MM_DD_HHMMSS_migration_name.
 
 ## Testing
 
+### Configurazione Test Environment
+
+Il progetto è configurato per usare **SQLite in-memory** per i test, garantendo velocità e isolamento.
+
+#### Configurazione (già presente in `phpunit.xml`)
+```xml
+<env name="DB_CONNECTION" value="sqlite"/>
+<env name="DB_DATABASE" value=":memory:"/>
+<env name="DB_FOREIGN_KEYS" value="false"/>
+```
+
+**Nota importante:** Le foreign key constraints sono **disabilitate** durante i test per semplificare il setup dei dati. Questo permette di testare operazioni CRUD senza dover creare manualmente tutti i record di riferimento.
+
 ### PHPUnit (backend)
+
 ```bash
 # Esegui tutti i test
 php artisan test
 
 # Esegui test specifici
-php artisan test --filter PostControllerTest
+php artisan test tests/Feature/PostControllerTest.php
+
+# Esegui con coverage (richiede Xdebug)
+php artisan test --coverage
+
+# Esegui test con output dettagliato
+php artisan test --verbose
 ```
 
-### Test consigliati da implementare
-- **Feature test**: creazione/modifica/eliminazione post (con authentication)
-- **Unit test**: validazione input, slugify helper, ecc.
-- **Browser test (Dusk)**: flow completo di creazione post via UI
+### Test Implementati
 
-### Esempio test (da creare)
+#### Feature Tests - PostController
+File: `tests/Feature/PostControllerTest.php`
+
+**Test disponibili (8 test, 17 assertions):**
+1. ✅ `test_can_insert_post_to_database` - Verifica inserimento post
+2. ✅ `test_can_store_large_html_content` - Verifica supporto longtext per HTML esteso
+3. ✅ `test_can_retrieve_post_from_database` - Verifica lettura post
+4. ✅ `test_can_update_post_in_database` - Verifica aggiornamento post
+5. ✅ `test_can_delete_post_from_database` - Verifica eliminazione post
+6. ✅ `test_post_can_have_nullable_fields` - Verifica campi opzionali (excerpt)
+7. ✅ `test_multiple_posts_can_be_created` - Verifica creazione multipla
+8. ✅ `test_post_content_supports_html` - Verifica supporto HTML complesso
+
+**Caratteristiche:**
+- Usa `RefreshDatabase` trait per database pulito ad ogni test
+- Testa operazioni CRUD a livello database (non HTTP)
+- Verifica supporto per contenuti HTML lunghi (campo `longtext`)
+- Foreign keys disabilitate per semplificare il testing
+
+### Creare Nuovi Test
+
+#### Esempio: Feature Test con Authentication
 ```php
-// tests/Feature/Admin/PostControllerTest.php
-public function test_admin_can_create_post()
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class AdminPostTest extends TestCase
 {
-    $admin = User::factory()->create();
-    $admin->roles()->attach(Role::where('nome', 'admin')->first());
-    
-    $this->actingAs($admin)
-         ->post(route('admin.posts.store'), [
-             'title' => 'Test Post',
-             'content' => 'Content',
-             'category_id' => 1,
-         ])
-         ->assertRedirect(route('admin.posts.index'));
-    
-    $this->assertDatabaseHas('posts', ['title' => 'Test Post']);
+    use RefreshDatabase;
+
+    public function test_admin_can_access_posts_index()
+    {
+        // Nota: Con FK disabilitate, non serve creare ruoli
+        $user = User::factory()->create();
+        
+        $response = $this->actingAs($user)
+            ->get(route('admin.posts.index'));
+        
+        $response->assertStatus(200);
+    }
 }
 ```
+
+#### Esempio: Unit Test
+```php
+<?php
+
+namespace Tests\Unit;
+
+use PHPUnit\Framework\TestCase;
+use App\Helpers\SlugHelper;
+
+class SlugHelperTest extends TestCase
+{
+    public function test_generates_valid_slug()
+    {
+        $this->assertEquals(
+            'il-mio-post',
+            SlugHelper::generate('Il Mio Post!')
+        );
+    }
+}
+```
+
+### Best Practices per Testing
+
+1. **Usa RefreshDatabase** per test con database
+2. **Non fare affidamento su FK** durante i test (sono disabilitate)
+3. **Testa comportamenti, non implementazione**
+4. **Mantieni test isolati** (nessuna dipendenza tra test)
+5. **Usa factory per dati di test** quando possibile
 
 ---
 
@@ -768,40 +967,6 @@ php artisan migrate --force
   - Configurare rewrite per front controller (`index.php`)
 - **SSL certificate** (Let's Encrypt raccomandato)
 
-### Esempio Nginx config
-```nginx
-server {
-    listen 80;
-    server_name yourdomain.com;
-    root /var/www/wa-app/public;
-    
-    add_header X-Frame-Options "SAMEORIGIN";
-    add_header X-Content-Type-Options "nosniff";
-    
-    index index.php;
-    
-    charset utf-8;
-    
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
-    
-    location = /favicon.ico { access_log off; log_not_found off; }
-    location = /robots.txt  { access_log off; log_not_found off; }
-    
-    error_page 404 /index.php;
-    
-    location ~ \.php$ {
-        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-        include fastcgi_params;
-    }
-    
-    location ~ /\.(?!well-known).* {
-        deny all;
-    }
-}
-```
 
 ### Deployment automatizzato (opzionale)
 - **Laravel Forge**: gestione server e deploy automatico
@@ -859,7 +1024,7 @@ php artisan migrate --path=database/migrations/2025_11_28_105000_add_tags_to_pos
   ```
 - Oppure elimina manualmente i prodotti dipendenti prima di eliminare il post
 
-### Problema: "Session store not set on request"
+### Problema: "Session store not set on request" 
 **Causa**: route non usa middleware 'web' o sessione non configurata  
 **Soluzione**:
 - Verifica che la route usi `middleware('web')`
@@ -876,13 +1041,6 @@ php artisan migrate --path=database/migrations/YYYY_MM_DD_HHMMSS_migration_name.
 php artisan migrate:fresh --seed
 ```
 
-### Problema: Namespace controller 'admin' vs 'Admin'
-**Causa**: Laravel PSR-4 richiede namespace PascalCase  
-**Soluzione**:
-- Assicurati che controller siano in `app/Http/Controllers/Admin/` (con A maiuscola)
-- Namespace nei file: `namespace App\Http\Controllers\Admin;`
-- Import nelle route: `use App\Http\Controllers\Admin\MediaController;`
-
 ### Problema: File upload non funziona / 404 su immagini
 **Causa**: symlink storage non creato  
 **Soluzione**:
@@ -893,7 +1051,7 @@ php artisan storage:link
 ```
 
 ### Problema: "Class 'Media' not found" o model non trovato
-**Causa**: model non importato o namespace errato  
+**Causa**: model non importato o namespace errato controlla che il model sia iportato bene. 
 **Soluzione**:
 ```php
 // In cima al controller
@@ -903,7 +1061,7 @@ use App\Models\Post;
 
 ### Problema: Permessi Git "insufficient permission for adding object"
 **Causa**: .git/objects ha ownership errato  
-**Soluzione**:
+**Soluzione**:Aggiungi i permessi writte per il tuo user.
 ```bash
 sudo chown -R $USER:$USER /path/to/wa-app/.git
 # Oppure per tutti i file:
@@ -913,41 +1071,6 @@ sudo chown -R $USER:$USER /path/to/wa-app
 ---
 
 ## Contribuire
-
-### Workflow Git
-1. **Fork** il repository
-2. **Crea un branch** per la tua feature:
-   ```bash
-   git checkout -b feature/nome-feature
-   ```
-3. **Commit** le modifiche:
-   ```bash
-   git add .
-   git commit -m "feat: aggiunge funzionalità X"
-   ```
-4. **Push** al tuo fork:
-   ```bash
-   git push origin feature/nome-feature
-   ```
-5. **Apri una Pull Request** su GitHub
-
-### Convenzioni
-- **Commit messages**: segui [Conventional Commits](https://www.conventionalcommits.org/)
-  - `feat:` nuova feature
-  - `fix:` bug fix
-  - `docs:` documentazione
-  - `refactor:` refactoring (no breaking changes)
-  - `test:` aggiunta test
-- **Code style**: segui PSR-12 (PHP) e ESLint config (JS)
-- **Test**: aggiungi test per nuove feature (coverage minimo 70%)
-
-### Checklist PR
-- [ ] Ho testato localmente le modifiche
-- [ ] Ho eseguito `php artisan test` (tutti i test passano)
-- [ ] Ho aggiornato la documentazione se necessario
-- [ ] Ho seguito le convenzioni di commit
-- [ ] Non ho committato `.env` o file sensibili
-
 ---
 
 ## License
@@ -1107,7 +1230,7 @@ Se applicabile
 
 ### [1.1.0] - 3 Dicembre 2025
 
-#### 🎉 Nuove Funzionalità
+####  Nuove Funzionalità
 **Gestione Media CRUD Completa**
 - ✅ MediaController con tutti i metodi CRUD (index, create, store, show, edit, update, destroy)
 - ✅ 4 pagine Vue complete in `Admin/Media/`: Index, Create, Edit, Show
@@ -1126,7 +1249,6 @@ Se applicabile
 - ✅ Tabella posts recenti con info principali
 
 #### 🔧 Miglioramenti Tecnici
-- ✅ Fix namespace controller: `admin` → `Admin` (conformità PSR-4)
 - ✅ Migration `2025_12_03_111053_add_missing_columns_to_medias_table.php`
   - Aggiunge colonne: `name`, `url`, `description`, `uploaded_by`
   - Foreign key `uploaded_by` → `users.id` con ON DELETE SET NULL

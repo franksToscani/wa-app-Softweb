@@ -8,6 +8,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Post;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class PostController extends Controller
 {
@@ -17,14 +20,20 @@ class PostController extends Controller
 
     public function index(Request $request)
     {
-        $posts = [];
-        if (Schema::hasTable('posts')) {
-            $posts = DB::table('posts')
-                ->select('id', 'title', 'excerpt', 'created_at')
-                ->orderBy('created_at', 'desc')
-                ->limit(100)
-                ->get();
+        if (!Schema::hasTable('posts')) {
+            return Inertia::render('Admin/Posts/Index', ['posts' => []]);
         }
+
+        $posts = QueryBuilder::for(Post::class)
+            ->allowedFilters([
+                AllowedFilter::partial('title'),
+                AllowedFilter::partial('excerpt'),
+            ])
+            ->allowedSorts(['created_at', 'title'])
+            ->defaultSort('-created_at')
+            ->select(['id', 'title', 'excerpt', 'created_at'])
+            ->paginate(20)
+            ->withQueryString();
 
         return Inertia::render('Admin/Posts/Index', [
             'posts' => $posts,
@@ -361,4 +370,4 @@ class PostController extends Controller
         return redirect()->route('admin.posts.index')->with('success', "Post creato (ID: {$id}).");
     }
 }
-    
+

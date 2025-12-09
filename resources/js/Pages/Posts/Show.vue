@@ -35,7 +35,7 @@ const getTags = () => {
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                         Dettaglio Post
+                        Dettaglio Post
                     </h2>
                     <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
                         Visualizza i dettagli completi del post
@@ -72,47 +72,56 @@ const getTags = () => {
 
         <div class="py-8">
             <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-                <!-- Header Card -->
-                <div class="bg-gradient-to-br from-blue-500 via-purple-500 to-purple-600 rounded-2xl shadow-2xl p-8 mb-6 text-white">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex items-center gap-3">
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/20 backdrop-blur-sm">
-                                #{{ props.post.id }}
-                            </span>
-                            <span 
-                                v-if="props.post.published_at"
-                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-500/80"
-                            >
-                                Pubblicato
-                            </span>
-                            <span 
-                                v-else
-                                class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-500/80"
-                            >
-                                Bozza
-                            </span>
+                <!-- Header Card avec un style professionnel et du texte foncé -->
+                    <div class="bg-white shadow-xl rounded-xl p-8 mb-6 border border-gray-200">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <!-- ID du post : Fond gris clair, texte foncé -->
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-700 border border-gray-300">
+                                    #{{ props.post.id }}
+                                </span>
+                                
+                                <!-- Statut Publié : Vert discret, texte foncé -->
+                                <span 
+                                    v-if="props.post.published_at"
+                                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800"
+                                >
+                                    Pubblicato
+                                </span>
+                                
+                                <!-- Statut Bozza : Jaune/Orange discret, texte foncé -->
+                                <span 
+                                    v-else
+                                    class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800"
+                                >
+                                    Bozza
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Titre : Texte gris très foncé -->
+                        <h1 class="text-4xl font-bold mb-4 text-gray-900">
+                            {{ props.post.title }}
+                        </h1>
+                        
+                        <!-- Informations de date : Texte gris moyen -->
+                        <div class="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+                            <div class="flex items-center gap-2">
+                                <!-- Icônes : Couleur gris moyen -->
+                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span>Pubblicato il: {{ formatDate(props.post.created_at) }}</span>
+                            </div>
+                            <div v-if="props.post.updated_at && props.post.updated_at !== props.post.created_at" class="flex items-center gap-2">
+                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>Aggiornato il: {{ formatDate(props.post.updated_at) }}</span>
+                            </div>
                         </div>
                     </div>
-                    
-                    <h1 class="text-4xl font-bold mb-4">
-                        {{ props.post.title }}
-                    </h1>
-                    
-                    <div class="flex flex-wrap items-center gap-4 text-sm opacity-90">
-                        <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                            <span>Creato: {{ formatDate(props.post.created_at) }}</span>
-                        </div>
-                        <div v-if="props.post.updated_at && props.post.updated_at !== props.post.created_at" class="flex items-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            <span>Aggiornato: {{ formatDate(props.post.updated_at) }}</span>
-                        </div>
-                    </div>
-                </div>
+
 
                 <!-- Main Content -->
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden mb-6">

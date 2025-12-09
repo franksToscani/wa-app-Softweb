@@ -36,7 +36,7 @@ defineProps({
 
           <div class="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <Link v-if="canRegister" :href="route('register')">
-              <PrimaryButton class="shadow-lg hover:shadow-xl transition-shadow">Inizia ora — è gratis ✨</PrimaryButton>
+              <PrimaryButton class="shadow-lg hover:shadow-xl transition-shadow">Inizia ora — è gratis </PrimaryButton>
             </Link>
             <Link v-if="canLogin" :href="route('login')" class="text-sm font-medium text-neutral-700 hover:text-primary-600 transition-colors">Oppure accedi →</Link>
           </div>
@@ -91,7 +91,7 @@ defineProps({
               <p class="mt-8 text-center text-lg text-neutral-700 leading-relaxed">Interfaccia pulita e intuitiva — prova a registrarti per vedere la demo del pannello amministrativo.</p>
               <div class="mt-8 flex justify-center">
                 <Link v-if="canRegister" :href="route('register')">
-                  <PrimaryButton class="shadow-lg hover:shadow-xl transition-shadow">Prova la demo 🚀</PrimaryButton>
+                  <PrimaryButton class="shadow-lg hover:shadow-xl transition-shadow">Prova la demo </PrimaryButton>
                 </Link>
               </div>
             </div>

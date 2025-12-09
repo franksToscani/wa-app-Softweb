@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Http\Controllers\Controller;
+use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class MediaController extends Controller
 {
@@ -16,7 +18,17 @@ class MediaController extends Controller
      */
     public function index()
     {
-        $media = Media::orderBy('created_at', 'desc')->get();
+        $media = QueryBuilder::for(Media::class)
+            ->allowedFilters([
+                AllowedFilter::partial('name'),
+                AllowedFilter::partial('file_name'),
+                AllowedFilter::exact('mime_type'),
+            ])
+            ->allowedSorts(['created_at', 'name', 'file_name', 'size'])
+            ->defaultSort('-created_at')
+            ->select(['id', 'name', 'file_name', 'mime_type', 'size', 'created_at'])
+            ->paginate(20)
+            ->withQueryString();
         
         return Inertia::render('Admin/Media/Index', [
             'media' => $media,
