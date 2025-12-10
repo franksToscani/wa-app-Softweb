@@ -4,7 +4,7 @@
         "title": "WA App API",
         "description": "API per gestione post, media e categorie",
         "contact": {
-            "email": "support@example.com"
+            "email": "franks.koudjagochui@studio.unibo.it"
         },
         "version": "1.0.0"
     },
@@ -14,64 +14,11 @@
             "description": "Server locale"
         },
         {
-            "url": "https://tuosito.com",
+            "url": "https://wa-app.com",
             "description": "Server produzione"
         }
     ],
     "paths": {
-        "/api/category-types": {
-            "post": {
-                "tags": [
-                    "CategoryTypes"
-                ],
-                "summary": "Crea un nuovo tipo di categoria",
-                "description": "Endpoint per creare un nuovo tipo di categoria",
-                "operationId": "981c8bae02c7071958be61c0a8681f1e",
-                "requestBody": {
-                    "description": "Dati del tipo categoria",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "name"
-                                ],
-                                "properties": {
-                                    "name": {
-                                        "type": "string",
-                                        "example": "Tipo A"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Tipo categoria creato",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer"
-                                        },
-                                        "name": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validazione fallita"
-                    }
-                }
-            }
-        },
         "/api/media": {
             "get": {
                 "tags": [
@@ -419,10 +366,6 @@
         }
     },
     "tags": [
-        {
-            "name": "CategoryTypes",
-            "description": "CategoryTypes"
-        },
         {
             "name": "Media",
             "description": "Media"

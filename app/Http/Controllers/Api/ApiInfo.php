@@ -8,7 +8,7 @@ namespace App\Http\Controllers\Api;
  *     version="1.0.0",
  *     description="API per gestione post, media e categorie",
  *     @OA\Contact(
- *         email="support@example.com"
+ *         email="franks.koudjagochui@studio.unibo.it"
  *     )
  * )
  * @OA\Server(
@@ -16,7 +16,7 @@ namespace App\Http\Controllers\Api;
  *     description="Server locale"
  * )
  * @OA\Server(
- *     url="https://tuosito.com",
+ *     url="https://wa-app.com",
  *     description="Server produzione"
  * )
  */
