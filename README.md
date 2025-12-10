@@ -678,6 +678,32 @@ PUT    /admin/media/{media}      → admin.media.update      (aggiorna metadata)
 DELETE /admin/media/{media}      → admin.media.destroy     (elimina + file)
 ```
 
+## Query API (Spatie Query Builder)
+
+Abbiamo integrato [Spatie Laravel Query Builder](https://github.com/spatie/laravel-query-builder) per standardizzare filtri, ordinamenti e paginazione su risorse admin (Posts, Media).
+
+### Parametri supportati
+- Filtri: `filter[campo]=valore`  
+  - Posts: `title` (partial), `excerpt` (partial)  
+  - Media: `name` (partial), `file_name` (partial), `mime_type` (exact)
+- Ordinamento: `sort=campo` oppure `sort=-campo` (desc)  
+  - Posts: `created_at`, `title`  
+  - Media: `created_at`, `name`, `file_name`, `size`
+- Paginazione: `page` (numero pagina). Page size attuale: 20.
+- Inclusione querystring persistente: i link di paginazione mantengono filtri e sort (`withQueryString()`).
+
+### Esempi
+- Posts per titolo, ordine recente:  
+  `/admin/posts?filter[title]=news&sort=-created_at`
+- Media per nome e mime, ordinati per size asc:  
+  `/admin/media?filter[name]=logo&filter[mime_type]=image/png&sort=size&page=2`
+
+## UI Admin Media: ricerca e sort server-side
+- Barra di ricerca con debounce: invia `filter[name]` e `filter[file_name]`.
+- Filtro `mime_type`.
+- Sort dinamico (campo + asc/desc) allineato ai `allowedSorts`.
+- Paginazione Inertia con preservazione dei parametri correnti.
+
 ### Validazione
 
 #### PostController@store
