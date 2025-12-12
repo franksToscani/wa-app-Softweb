@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Spatie\QueryBuilder\QueryBuilder;
 use Spatie\QueryBuilder\AllowedFilter;
+use Illuminate\Support\Facades\Schema;
 
 class PostApiController extends Controller
 {
@@ -63,7 +64,7 @@ class PostApiController extends Controller
      */
     public function index(Request $request)
     {
-        if (!\Illuminate\Support\Facades\Schema::hasTable('posts')) {
+        if (!Schema::hasTable('posts')) {
             return response()->json(['data' => []], 200);
         }
 
@@ -110,7 +111,7 @@ class PostApiController extends Controller
      */
     public function show($id)
     {
-        if (!\Illuminate\Support\Facades\Schema::hasTable('posts')) {
+        if (!Schema::hasTable('posts')) {
             return response()->json(['error' => 'Posts table missing'], 404);
         }
 
@@ -120,5 +121,69 @@ class PostApiController extends Controller
         }
 
         return response()->json($post, 200);
+    }
+
+    /**
+     * @OA\Get(
+     *   path="/api/categories/{categoryId}/posts",
+     *   summary="Lista di post per categoria",
+     *   description="Restituisce i post associati a una categoria specifica",
+     *   tags={"Posts"},
+     *   @OA\Parameter(
+     *     name="categoryId",
+     *     in="path",
+     *     required=true,
+     *     description="ID della categoria",
+     *     @OA\Schema(type="integer", example=3)
+     *   ),
+     *   @OA\Parameter(
+     *     name="filter[title]",
+     *     in="query",
+     *     description="Filtra per titolo (ricerca parziale)",
+     *     @OA\Schema(type="string", example="news")
+     *   ),
+     *   @OA\Parameter(
+     *     name="filter[excerpt]",
+     *     in="query",
+     *     description="Filtra per estratto (ricerca parziale)",
+     *     @OA\Schema(type="string", example="aggiornamento")
+     *   ),
+     *   @OA\Parameter(
+     *     name="sort",
+     *     in="query",
+     *     description="Ordinamento: created_at, title (usa - per discendente)",
+     *     @OA\Schema(type="string", example="-created_at")
+     *   ),
+     *   @OA\Parameter(
+     *     name="page",
+     *     in="query",
+     *     description="Numero pagina (default 1)",
+     *     @OA\Schema(type="integer", example=1)
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Lista post per categoria"
+     *   ),
+     *   @OA\Response(response=404, description="Nessun post o tabella mancante")
+     * )
+     */
+    public function byCategory(int $categoryId)
+    {
+        if (!Schema::hasTable('posts')) {
+            return response()->json(['error' => 'Posts table missing'], 404);
+        }
+
+        $posts = QueryBuilder::for(Post::class)
+            ->where('categories_id', $categoryId)
+            ->allowedFilters([
+                AllowedFilter::partial('title'),
+                AllowedFilter::partial('excerpt'),
+            ])
+            ->allowedSorts(['created_at', 'title'])
+            ->defaultSort('-created_at')
+            ->select(['id', 'title', 'excerpt', 'created_at', 'published_at', 'categories_id'])
+            ->paginate(20);
+
+        return response()->json($posts, 200);
     }
 }

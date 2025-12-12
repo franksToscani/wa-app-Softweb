@@ -40,6 +40,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        //per le rotte api
+        'api' => [
+        'driver' => 'sanctum',
+        'provider' => 'users',
+    ],
+
     ],
 
     /*

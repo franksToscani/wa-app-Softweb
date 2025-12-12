@@ -1358,43 +1358,57 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 
-## Note about tests and migrations (important)
+## Spatie Query Builder & API REST
 
-During local development we run the test-suite using SQLite in-memory to keep tests fast and isolated.
+### Implementazione Query Builder
+A partire dalla versione corrente, tutte le liste admin (Posts, Media) usano **Spatie Laravel Query Builder** per standardizzare filtri, ordinamenti e paginazione:
 
-To make the existing project migrations run reliably under SQLite (used by PHPUnit in `phpunit.xml`) a
-small set of compatibility adjustments were made to the migration files in this branch. These are **test-focused**
-changes that avoid SQLite-specific migration errors such as:
+#### Parametri API standardizzati
+- **Filtri**: `filter[campo]=valore` (partial o exact a seconda del filtro)
+  - Posts: `title` (partial), `excerpt` (partial)
+  - Media: `name` (partial), `file_name` (partial), `mime_type` (exact)
+- **Ordinamento**: `sort=campo` o `sort=-campo` (discendente)
+  - Posts: `created_at`, `title`
+  - Media: `created_at`, `name`, `file_name`, `size`
+- **Paginazione**: `page=N` (default 20 per pagina)
+- **Persistenza**: i link di paginazione mantengono filtri/sort via `withQueryString()`
 
-- composite primary keys that include an autoincrement `id` column (SQLite can't create an AUTOINCREMENT column
-	as part of a composite primary key);
-- explicit, repeated index/unique names (SQLite treats index names globally in an in-memory DB and identically
-	named indexes across tables cause collisions).
-
-Why we did this
-- The changes keep tests green and fast (no external MySQL test DB required). They are minimal and scoped to
-	migration definitions only so tests can run in CI or locally using `php artisan test`.
-
-How this affects production
-- If your production schema requires the original MySQL-only constraints (composite PKs or specific index names),
-	you should either:
-	- create a dedicated MySQL test database and update `phpunit.xml` accordingly, or
-	- add separate migration(s) that apply production-only constraints at deploy time (or gated by an environment
-		check).
-
-Commands to run the test-suite locally
+#### Esempi di utilizzo
 ```bash
-# ensure php-sqlite3 is installed (on Debian/Ubuntu):
-sudo apt-get update
-sudo apt-get install -y php-sqlite3
+# Posts recenti con titolo "news"
+GET /api/posts?filter[title]=news&sort=-created_at
 
-# fix permissions if you get storage permission errors:
-sudo chown -R $(whoami):www-data storage bootstrap/cache
-sudo chmod -R ug+rwx storage bootstrap/cache
-
-# run tests (non-parallel):
-php artisan test --no-coverage
+# Media PNG di nome "logo", pagina 2
+GET /api/media?filter[name]=logo&filter[mime_type]=image/png&sort=size&page=2
 ```
+
+### API REST Documentate
+Le API sono disponibili su `/api/` e documentate con **L5-Swagger** (OpenAPI 3.0):
+
+#### Endpoint pubblici (GET)
+- `GET /api/posts` — Lista posts paginata con filtri/sort
+- `GET /api/posts/{id}` — Dettaglio singolo post
+- `GET /api/media` — Lista media paginata con filtri/sort
+- `GET /api/media/{id}` — Dettaglio singolo media
+
+#### Endpoint POST (interno)
+- `POST /api/category-types` — Crea tipo categoria
+
+### Accesso alla documentazione Swagger
+```bash
+# Genera/aggiorna la documentazione Swagger
+php artisan l5-swagger:generate
+
+# Accedi alla UI interattiva
+http://localhost:8000/api/documentation
+```
+
+Da qui puoi:
+- Leggere parametri, filtri, response di ogni endpoint
+- Testare le API direttamente (Try it out)
+- Vedere esempi di richiesta/risposta
+
+---
 
 compatibility edits so local tests pass quickly.
 # wa-app-Softweb
