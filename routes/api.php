@@ -13,12 +13,14 @@ use App\Http\Controllers\Api\MediaApiController;
 Route::middleware('auth:sanctum')->group(function () {
 
     // Tutte le rotte qui sotto richiedono l'header Bearer Token
-    // token: 1|3xslXATnFWHt8vFvvnuNrlgx720yX0APwZ8t5Tmfa2552aea
+    // token: 2|0EuWmCBSJxB0odzvOIXd9oB7eIauNLzujfCX79wr57674e52
 
 // Posts API
 Route::get('/posts', [PostApiController::class, 'index']);
-Route::get('/categories/{categoryId}/posts', [PostApiController::class, 'byCategory']);
 Route::get('/posts/{id}', [PostApiController::class, 'show']);
+//posts by category
+Route::get('/categories/{categoryId}/posts', [PostApiController::class, 'byCategory']);
+
 
 // Media API
 Route::get('/media', [MediaApiController::class, 'index']);
